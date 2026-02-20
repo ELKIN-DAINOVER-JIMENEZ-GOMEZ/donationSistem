@@ -1,0 +1,171 @@
+<div class="rk-root">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <header class="rk-header">
+    <div class="rk-header-bg">
+      <div class="rk-star rk-star-1">★</div>
+      <div class="rk-star rk-star-2">★</div>
+      <div class="rk-star rk-star-3">✦</div>
+    </div>
+    <div class="rk-header-inner">
+      <div class="trophy">🏆</div>
+      <h1>Ranking de Donantes</h1>
+      <p>Celebramos a las personas que más impacto han generado</p>
+
+      <div class="rk-stats">
+        <div class="rk-stat">
+          <span class="rk-stat-val">{{ formatMontoFull(totalRecaudado) }}</span>
+          <span class="rk-stat-lbl">Total recaudado</span>
+        </div>
+        <div class="rk-divider"></div>
+        <div class="rk-stat">
+          <span class="rk-stat-val">{{ totalDonaciones }}</span>
+          <span class="rk-stat-lbl">Donaciones totales</span>
+        </div>
+        <div class="rk-divider"></div>
+        <div class="rk-stat">
+          <span class="rk-stat-val">{{ ranking.length }}</span>
+          <span class="rk-stat-lbl">Donantes activos</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ LOADING ═══════════════════════════════════════════════ -->
+  <div class="rk-loading" *ngIf="isLoading">
+    <div class="podium-skeleton">
+      <div class="skel-bar" style="height:120px;animation-delay:0.1s"></div>
+      <div class="skel-bar" style="height:160px;animation-delay:0s"></div>
+      <div class="skel-bar" style="height:100px;animation-delay:0.2s"></div>
+    </div>
+    <div class="list-skeleton">
+      <div class="skel-row" *ngFor="let i of [1,2,3,4,5,6,7]"
+           [style.animation-delay]="i * 0.05 + 's'"></div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isLoading && ranking.length > 0">
+
+    <!-- ══ PODIO TOP 3 ═════════════════════════════════════════ -->
+    <section class="podio-section">
+      <div class="podio">
+
+        <!-- 2do lugar (izquierda) -->
+        <div class="podio-slot podio-2" *ngIf="top3[1]">
+          <div class="podio-avatar-wrap">
+            <div class="podio-avatar av-silver">{{ getInitials(top3[1].nombre) }}</div>
+            <div class="podio-medal">🥈</div>
+          </div>
+          <div class="podio-info">
+            <p class="podio-name">{{ top3[1].nombre.split(' ')[0] }}</p>
+            <p class="podio-amount">{{ formatMonto(top3[1].totalDonado) }}</p>
+          </div>
+          <div class="podio-block silver">
+            <span>2°</span>
+          </div>
+        </div>
+
+        <!-- 1er lugar (centro) -->
+        <div class="podio-slot podio-1" *ngIf="top3[0]">
+          <div class="podio-crown">👑</div>
+          <div class="podio-avatar-wrap">
+            <div class="podio-avatar av-gold">{{ getInitials(top3[0].nombre) }}</div>
+            <div class="podio-medal">🥇</div>
+          </div>
+          <div class="podio-info">
+            <p class="podio-name">{{ top3[0].nombre.split(' ')[0] }}</p>
+            <p class="podio-amount gold-amt">{{ formatMonto(top3[0].totalDonado) }}</p>
+          </div>
+          <div class="podio-block gold">
+            <span>1°</span>
+          </div>
+        </div>
+
+        <!-- 3er lugar (derecha) -->
+        <div class="podio-slot podio-3" *ngIf="top3[2]">
+          <div class="podio-avatar-wrap">
+            <div class="podio-avatar av-bronze">{{ getInitials(top3[2].nombre) }}</div>
+            <div class="podio-medal">🥉</div>
+          </div>
+          <div class="podio-info">
+            <p class="podio-name">{{ top3[2].nombre.split(' ')[0] }}</p>
+            <p class="podio-amount">{{ formatMonto(top3[2].totalDonado) }}</p>
+          </div>
+          <div class="podio-block bronze">
+            <span>3°</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══ TABLA COMPLETA ════════════════════════════════════════ -->
+    <section class="rk-table-section">
+
+      <!-- Controles de límite -->
+      <div class="rk-controls">
+        <span class="rk-controls-lbl">Mostrar:</span>
+        <div class="limit-btns">
+          <button *ngFor="let n of [10, 20, 50]"
+                  class="limit-btn" [class.active]="limite === n"
+                  (click)="changeLimit(n)" type="button">Top {{ n }}</button>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="rk-table">
+
+        <!-- Cabecera -->
+        <div class="rk-table-head">
+          <span class="col-pos">#</span>
+          <span class="col-user">Donante</span>
+          <span class="col-amount">Total donado</span>
+          <span class="col-count">Donaciones</span>
+          <span class="col-avg">Promedio</span>
+        </div>
+
+        <!-- Filas del resto (4+) -->
+        <div class="rk-row" *ngFor="let d of resto"
+             [class.top4]="d.posicion === 4">
+
+          <div class="col-pos">
+            <span class="pos-num" [class.top4-num]="d.posicion === 4">{{ d.posicion }}</span>
+            <span class="tendencia" *ngIf="d.tendencia === 'up'">▲</span>
+            <span class="tendencia down" *ngIf="d.tendencia === 'down'">▼</span>
+            <span class="tendencia same" *ngIf="d.tendencia === 'same'">—</span>
+          </div>
+
+          <div class="col-user">
+            <div class="row-avatar" [class]="'av-color-' + (d.posicion % 6)">
+              {{ getInitials(d.nombre) }}
+            </div>
+            <div class="row-user-info">
+              <p class="row-name">{{ d.nombre }}</p>
+              <div class="row-bar-wrap">
+                <div class="row-bar">
+                  <div class="row-bar-fill" [style.width.%]="getBarWidth(d.totalDonado)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-amount">
+            <span class="amount-val">{{ formatMontoFull(d.totalDonado) }}</span>
+          </div>
+
+          <div class="col-count">
+            <span class="count-badge">{{ d.cantidadDonaciones }}</span>
+          </div>
+
+          <div class="col-avg">
+            <span class="avg-val">{{ formatMonto(d.promedioDonacion) }}</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </ng-container>
+
+</div>

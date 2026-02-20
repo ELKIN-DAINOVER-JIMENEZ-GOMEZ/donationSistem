@@ -1,0 +1,8 @@
+ <div class="toast-container" role="region" aria-live="polite" aria-label="Notificaciones">
+      <div *ngFor="let toast of toastService.toasts()"
+           class="toast" [ngClass]="'toast-' + toast.type"
+           (click)="toastService.dismiss(toast.id)">
+        <span class="toast-icon">{{ iconMap[toast.type] }}</span>
+        <span class="toast-message">{{ toast.message }}</span>
+        <button class="toast-close" [attr.aria-label]="'Cerrar notificación'">✕</button>
+      </div>

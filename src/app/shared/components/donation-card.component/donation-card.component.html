@@ -1,0 +1,59 @@
+   <article class="don-card">
+
+      <!-- Header: avatar + usuario + fecha -->
+      <div class="don-card-header">
+        <app-avatar
+          [nombre]="donacion.nombreUsuario || 'U'"
+          [size]="'sm'">
+        </app-avatar>
+        <div class="don-user-info">
+          <span class="don-user-name">{{ donacion.nombreUsuario || 'Usuario' }}</span>
+          <span class="don-user-email">{{ donacion.emailUsuario }}</span>
+        </div>
+        <app-badge [estado]="donacion.estado" [showDot]="true" size="sm"></app-badge>
+      </div>
+
+      <!-- Body: tipo + monto/detalle + descripción -->
+      <div class="don-card-body">
+        <div class="don-tipo-row">
+          <span class="don-tipo-label">{{ tipoLabel }}</span>
+          <span class="don-monto" *ngIf="donacion.monto">
+            {{ donacion.monto | copCurrency }}
+          </span>
+        </div>
+
+        <p class="don-descripcion">{{ donacion.descripcion }}</p>
+
+        <p class="don-especies" *ngIf="donacion.detalleEspecies">
+          <strong>Detalle:</strong> {{ donacion.detalleEspecies }}
+        </p>
+      </div>
+
+      <!-- Footer: fecha + acciones -->
+      <div class="don-card-footer">
+        <span class="don-fecha">{{ donacion.fechaDonacion | fechaLegible }}</span>
+
+        <div class="don-actions" *ngIf="showActions && puedeGestionarse(donacion)">
+          <button class="don-btn don-btn-confirm"
+                  (click)="onConfirmar.emit(donacion.id)">
+            ✓ Confirmar
+          </button>
+          <button class="don-btn don-btn-reject"
+                  (click)="onRechazar.emit(donacion.id)">
+            ✕ Rechazar
+          </button>
+        </div>
+
+        <div class="don-confirmed-info" *ngIf="donacion.fechaConfirmacion">
+          <span class="don-conf-label">Confirmada:</span>
+          <span>{{ donacion.fechaConfirmacion | fechaLegible:'short' }}</span>
+        </div>
+      </div>
+
+      <!-- Notas admin (solo si hay) -->
+      <div class="don-notas" *ngIf="donacion.notas">
+        <span class="don-notas-icon">📋</span>
+        {{ donacion.notas }}
+      </div>
+
+    </article>

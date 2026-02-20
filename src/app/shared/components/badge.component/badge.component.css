@@ -1,0 +1,27 @@
+.badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      line-height: 1.6;
+    }
+    .badge-sm { font-size: 0.65rem; padding: 1px 8px; }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef9c3; color: #a16207; }
+    .badge-danger  { background: #fee2e2; color: #b91c1c; }
+    .badge-info    { background: #dbeafe; color: #1d4ed8; }
+    .badge-neutral { background: #f1f5f9; color: #475569; }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .badge-success .badge-dot { background: #16a34a; }
+    .badge-warning .badge-dot { background: #ca8a04; }
+    .badge-danger  .badge-dot { background: #dc2626; }
+    .badge-info    .badge-dot { background: #2563eb; }
+    .badge-neutral .badge-dot { background: #64748b; }

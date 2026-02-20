@@ -1,0 +1,270 @@
+<app-navbar></app-navbar>
+
+<main class="main-content">
+  
+  <!-- Hero Section -->
+  <section id="inicio" class="hero-section">
+    <div class="hero-background">
+      <div class="gradient-orb orb-1"></div>
+      <div class="gradient-orb orb-2"></div>
+      <div class="gradient-orb orb-3"></div>
+      <div class="grid-overlay"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Transformando Vidas Juntos
+      </div>
+      
+      <h1 class="hero-title">
+        Dona con
+        <span class="title-highlight">Propósito</span><br>
+        Cambia con
+        <span class="title-highlight">Impacto</span>
+      </h1>
+      
+      <p class="hero-description">
+        Únete a nuestra comunidad de personas comprometidas con generar un cambio real.
+        Cada donación cuenta una historia de transformación.
+      </p>
+      
+      <div class="hero-buttons">
+        <button routerLink="/register" class="btn-hero-primary">
+          <span>Comenzar Ahora</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </button>
+        <button (click)="scrollToSection('donaciones')" class="btn-hero-secondary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Ver Cómo Funciona</span>
+        </button>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div *ngFor="let stat of stats" class="stat-card animate-fade-in">
+          <div class="stat-icon-wrapper">
+            <div class="stat-icon bg-gradient-to-br {{stat.gradient}}">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="stat.icon" />
+              </svg>
+            </div>
+          </div>
+          <div class="stat-value">{{stat.value}}</div>
+          <div class="stat-label">{{stat.label}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <div class="mouse">
+        <div class="wheel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="donaciones" class="features-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-badge">Por Qué Elegirnos</span>
+        <h2 class="section-title">
+          Impacto Real,
+          <span class="text-gradient">Transparencia Total</span>
+        </h2>
+        <p class="section-description">
+          Nuestra plataforma conecta directamente donantes con comunidades,
+          garantizando que cada contribución llegue donde más se necesita.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div *ngFor="let feature of features; let i = index" 
+             class="feature-card"
+             [style.animation-delay.ms]="i * 100">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon bg-gradient-to-br {{feature.gradient}}">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="feature.icon" />
+              </svg>
+            </div>
+            <div class="feature-glow bg-gradient-to-br {{feature.gradient}}"></div>
+          </div>
+          <h3 class="feature-title">{{feature.title}}</h3>
+          <p class="feature-description">{{feature.description}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section id="impacto" class="impact-section">
+    <div class="section-container">
+      <div class="impact-content">
+        <div class="impact-visual">
+          <div class="impact-image">
+            <div class="image-placeholder">
+              <svg class="w-32 h-32 text-emerald-400/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="impact-stats-float">
+            <div class="float-stat">
+              <div class="float-stat-value">98%</div>
+              <div class="float-stat-label">Satisfacción</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="impact-text">
+          <span class="section-badge">Nuestro Impacto</span>
+          <h2 class="section-title">
+            Juntos Podemos
+            <span class="text-gradient">Cambiar el Mundo</span>
+          </h2>
+          <p class="impact-description">
+            Cada donación es una semilla de esperanza que florece en oportunidades reales.
+            Hemos ayudado a miles de familias a acceder a educación, salud y alimentación.
+          </p>
+          <div class="impact-highlights">
+            <div class="highlight-item">
+              <div class="highlight-icon">✓</div>
+              <span>100% de transparencia en cada donación</span>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon">✓</div>
+              <span>Reportes detallados de impacto mensual</span>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-icon">✓</div>
+              <span>Conexión directa con las comunidades</span>
+            </div>
+          </div>
+          <button routerLink="/about" class="btn-impact">
+            Conoce Más Historias
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="comunidad" class="testimonials-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-badge">Testimonios</span>
+        <h2 class="section-title">
+          Lo Que Dice Nuestra
+          <span class="text-gradient">Comunidad</span>
+        </h2>
+      </div>
+
+      <div class="testimonials-grid">
+        <div *ngFor="let testimonial of testimonials; let i = index" 
+             class="testimonial-card"
+             [style.animation-delay.ms]="i * 150">
+          <div class="testimonial-content">
+            <div class="quote-icon">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+              </svg>
+            </div>
+            <p class="testimonial-text">{{testimonial.content}}</p>
+          </div>
+          <div class="testimonial-author">
+            <div class="author-avatar">{{testimonial.avatar}}</div>
+            <div>
+              <div class="author-name">{{testimonial.name}}</div>
+              <div class="author-role">{{testimonial.role}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <div class="cta-background">
+        <div class="cta-orb orb-1"></div>
+        <div class="cta-orb orb-2"></div>
+      </div>
+      <h2 class="cta-title">
+        ¿Listo para Hacer la Diferencia?
+      </h2>
+      <p class="cta-description">
+        Únete a nuestra comunidad hoy y comienza tu viaje de transformación social.
+      </p>
+      <button routerLink="/register" class="btn-cta">
+        Comenzar Ahora
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-circle">
+            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" 
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <span class="logo-text">DonaVida</span>
+        </div>
+        <p class="footer-description">
+          Transformando vidas a través de la generosidad y el compromiso social.
+        </p>
+      </div>
+      
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4 class="footer-column-title">Plataforma</h4>
+          <a href="#" class="footer-link">Cómo Funciona</a>
+          <a href="#" class="footer-link">Precios</a>
+          <a href="#" class="footer-link">Casos de Éxito</a>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Recursos</h4>
+          <a href="#" class="footer-link">Blog</a>
+          <a href="#" class="footer-link">Guías</a>
+          <a href="#" class="footer-link">API</a>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Compañía</h4>
+          <a href="#" class="footer-link">Sobre Nosotros</a>
+          <a href="#" class="footer-link">Contacto</a>
+          <a href="#" class="footer-link">Carreras</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p class="footer-copyright">© 2024 DonaVida. Todos los derechos reservados.</p>
+      <div class="footer-social">
+        <a href="#" class="social-link">Twitter</a>
+        <a href="#" class="social-link">LinkedIn</a>
+        <a href="#" class="social-link">Instagram</a>
+      </div>
+    </div>
+  </footer>
+
+</main>

@@ -1,0 +1,281 @@
+<div class="cd-root">
+
+  <!-- ══ ÉXITO ══════════════════════════════════════════════ -->
+  <div class="cd-success" *ngIf="isSuccess">
+    <div class="success-orb">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </div>
+    <h2>¡Donación registrada!</h2>
+    <p>Tu donación quedó en estado <strong>Pendiente</strong>. La revisaremos y te notificaremos cuando sea confirmada.</p>
+    <button class="btn-primary" (click)="goToDonaciones()">
+      Ver mis donaciones
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ══ FORMULARIO ══════════════════════════════════════════ -->
+  <ng-container *ngIf="!isSuccess">
+
+    <!-- Header -->
+    <header class="cd-header">
+      <a routerLink="/donaciones/mis-donaciones" class="cd-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>
+        </svg>
+        Mis donaciones
+      </a>
+      <div class="cd-header-title">
+        <h1>Nueva donación</h1>
+        <p>Paso {{ currentStep }} de {{ totalSteps }}</p>
+      </div>
+    </header>
+
+    <!-- Progress -->
+    <div class="cd-progress">
+      <div class="prog-track">
+        <div class="prog-fill" [style.width.%]="(currentStep / totalSteps) * 100"></div>
+      </div>
+      <div class="prog-steps">
+        <div class="prog-step" *ngFor="let s of [1,2,3]; let i = index"
+             [class.done]="currentStep > i+1" [class.active]="currentStep === i+1">
+          <div class="prog-dot">
+            <svg *ngIf="currentStep > i+1" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2,6 5,9 10,3"/>
+            </svg>
+            <span *ngIf="currentStep <= i+1">{{ i+1 }}</span>
+          </div>
+          <span class="prog-label">{{ ['Tipo','Detalle','Confirmar'][i] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cd-body">
+
+      <!-- ── PASO 1: Tipo ─────────────────────────────────── -->
+      <div class="cd-panel" *ngIf="currentStep === 1">
+        <div class="panel-head">
+          <h2>¿Cómo quieres donar?</h2>
+          <p>Elige la modalidad que mejor se adapte a ti</p>
+        </div>
+
+        <div class="tipo-grid">
+          <label *ngFor="let t of tiposDonacion"
+                 class="tipo-card" [class.selected]="form.tipo === t.value">
+            <input type="radio" [value]="t.value" [(ngModel)]="form.tipo" class="sr-only"/>
+            <div class="tipo-icon" [style.background]="t.color + '18'" [style.color]="t.color">
+              <!-- Money -->
+              <svg *ngIf="t.icon === 'money'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              <!-- Box -->
+              <svg *ngIf="t.icon === 'box'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+              </svg>
+              <!-- Handshake -->
+              <svg *ngIf="t.icon === 'handshake'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+              </svg>
+            </div>
+            <div class="tipo-info">
+              <span class="tipo-label">{{ t.label }}</span>
+              <span class="tipo-desc">{{ t.desc }}</span>
+            </div>
+            <div class="tipo-check" [style.background]="t.color">
+              <svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="2,6 5,9 10,3"/>
+              </svg>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- ── PASO 2: Detalle ──────────────────────────────── -->
+      <div class="cd-panel" *ngIf="currentStep === 2">
+
+        <!-- MONETARIA -->
+        <ng-container *ngIf="form.tipo === 'MONETARIA'">
+          <div class="panel-head">
+            <h2>¿Cuánto deseas donar?</h2>
+            <p>Cada peso hace la diferencia</p>
+          </div>
+
+          <div class="monto-grid">
+            <button *ngFor="let m of montosSugeridos"
+                    class="monto-btn" type="button"
+                    [class.selected]="form.monto === m && !montoPersonalizado"
+                    (click)="selectMonto(m)">
+              ${{ m | number }}
+            </button>
+            <button class="monto-btn monto-custom" type="button"
+                    [class.selected]="montoPersonalizado"
+                    (click)="activarMontoPersonalizado()">
+              Otro monto
+            </button>
+          </div>
+
+          <div class="monto-input-wrap" *ngIf="montoPersonalizado">
+            <label class="field-lbl">Ingresa el monto (mín. $1.000)</label>
+            <div class="field-inner">
+              <span class="field-prefix">$</span>
+              <input type="number" [(ngModel)]="form.monto" min="1000" max="1000000"
+                     placeholder="0" class="field-input currency-input"/>
+              <span class="field-suffix">COP</span>
+            </div>
+          </div>
+
+          <div class="impacto-card" *ngIf="form.monto && form.monto >= 1000">
+            <div class="impacto-icon">✨</div>
+            <div>
+              <p class="impacto-label">Con {{ montoFormateado }} podrías financiar:</p>
+              <p class="impacto-value">{{ impactoActual }}</p>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- ESPECIES -->
+        <ng-container *ngIf="form.tipo === 'ESPECIES'">
+          <div class="panel-head">
+            <h2>¿Qué vas a donar?</h2>
+            <p>Describe los artículos o bienes que donarás</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-lbl">Detalle de los artículos <span class="req">*</span></label>
+            <textarea [(ngModel)]="form.detalleEspecies" rows="5"
+                      placeholder="Ej: 20 kg de ropa para niños en buen estado, 5 pares de zapatos talla 30-32, libros de primaria..."
+                      class="field-textarea" maxlength="1000"></textarea>
+            <span class="char-count">{{ form.detalleEspecies.length }}/1000</span>
+          </div>
+        </ng-container>
+
+        <!-- SERVICIOS -->
+        <ng-container *ngIf="form.tipo === 'SERVICIOS'">
+          <div class="panel-head">
+            <h2>¿Qué servicio ofreces?</h2>
+            <p>Cuéntanos tus habilidades y disponibilidad</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-lbl">Descripción del servicio <span class="req">*</span></label>
+            <textarea [(ngModel)]="form.descripcion" rows="5"
+                      placeholder="Ej: Ofrezco clases de matemáticas los sábados para niños de primaria, disponibilidad de 4 horas semanales..."
+                      class="field-textarea" maxlength="500"></textarea>
+            <span class="char-count">{{ form.descripcion.length }}/500</span>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <!-- ── PASO 3: Confirmar ────────────────────────────── -->
+      <div class="cd-panel" *ngIf="currentStep === 3">
+        <div class="panel-head">
+          <h2>Confirma tu donación</h2>
+          <p>Revisa los detalles antes de enviar</p>
+        </div>
+
+        <!-- Resumen -->
+        <div class="resumen-card">
+          <div class="resumen-row">
+            <span class="resumen-key">Tipo</span>
+            <span class="resumen-val tipo-chip">{{ form.tipo }}</span>
+          </div>
+          <div class="resumen-row" *ngIf="form.tipo === 'MONETARIA' && form.monto">
+            <span class="resumen-key">Monto</span>
+            <span class="resumen-val monto-highlight">{{ montoFormateado }}</span>
+          </div>
+          <div class="resumen-row" *ngIf="form.tipo === 'ESPECIES'">
+            <span class="resumen-key">Artículos</span>
+            <span class="resumen-val">{{ form.detalleEspecies | slice:0:60 }}{{ form.detalleEspecies.length > 60 ? '…' : '' }}</span>
+          </div>
+        </div>
+
+        <!-- Descripción general -->
+        <div class="field-group">
+          <label class="field-lbl">
+            {{ form.tipo === 'SERVICIOS' ? 'Descripción (ya ingresada)' : 'Descripción general' }}
+            <span class="req" *ngIf="form.tipo !== 'SERVICIOS'">*</span>
+          </label>
+          <textarea *ngIf="form.tipo !== 'SERVICIOS'"
+                    [(ngModel)]="form.descripcion" rows="4"
+                    placeholder="Agrega cualquier detalle adicional sobre tu donación..."
+                    class="field-textarea" maxlength="500"></textarea>
+          <div *ngIf="form.tipo === 'SERVICIOS'" class="desc-preview">{{ form.descripcion }}</div>
+        </div>
+
+        <!-- Comprobante -->
+        <div class="field-group">
+          <label class="field-lbl">Comprobante <span class="opt">(opcional)</span></label>
+          <div class="field-inner">
+            <span class="field-icon-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+            </span>
+            <input type="url" [(ngModel)]="form.comprobante"
+                   placeholder="https://drive.google.com/tu-comprobante"
+                   class="field-input with-icon"/>
+          </div>
+        </div>
+
+        <!-- Términos -->
+        <label class="terms-row">
+          <div class="custom-check" [class.checked]="form.acceptTerms">
+            <input type="checkbox" [(ngModel)]="form.acceptTerms" class="sr-only"/>
+            <svg *ngIf="form.acceptTerms" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2,6 5,9 10,3"/>
+            </svg>
+          </div>
+          <span>Confirmo que la información es verídica y acepto los
+            <a routerLink="/terms" class="link-accent">Términos de Uso</a></span>
+        </label>
+
+      </div>
+
+      <!-- Error banner -->
+      <div class="error-banner" *ngIf="errorMessage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Navegación -->
+      <div class="cd-nav">
+        <button type="button" class="btn-back" (click)="prevStep()" *ngIf="currentStep > 1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>
+          </svg>
+          Atrás
+        </button>
+
+        <button type="button" class="btn-primary ml-auto"
+                *ngIf="currentStep < 3" (click)="nextStep()">
+          Continuar
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+          </svg>
+        </button>
+
+        <button type="button" class="btn-primary ml-auto btn-submit"
+                *ngIf="currentStep === 3" (click)="onSubmit()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">
+            Enviar donación
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </span>
+          <span class="loading-inner" *ngIf="isLoading">
+            <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/>
+            </svg>
+            Enviando...
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,92 @@
+<nav 
+  class="navbar fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+  [class.scrolled]="isScrolled">
+  
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 group cursor-pointer">
+        <div class="logo-circle">
+          <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" 
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <span class="logo-text">DonaVida</span>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a (click)="scrollToSection('inicio')" 
+           class="nav-link">
+          Inicio
+        </a>
+        <a (click)="scrollToSection('donaciones')" 
+           class="nav-link">
+          Donaciones
+        </a>
+        <a (click)="scrollToSection('impacto')" 
+           class="nav-link">
+          Nuestro Impacto
+        </a>
+        <a (click)="scrollToSection('comunidad')" 
+           class="nav-link">
+          Comunidad
+        </a>
+      </div>
+
+      <!-- Auth Buttons -->
+      <div class="hidden md:flex items-center space-x-4">
+        <button 
+          routerLink="/login"
+          class="btn-secondary">
+          Iniciar Sesión
+        </button>
+        <button 
+          routerLink="/register"
+          class="btn-primary">
+          Registrarse
+        </button>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button 
+        (click)="toggleMobileMenu()"
+        class="md:hidden mobile-menu-btn"
+        [class.active]="isMobileMenuOpen">
+        <span class="line line-1"></span>
+        <span class="line line-2"></span>
+        <span class="line line-3"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div 
+    class="mobile-menu md:hidden"
+    [class.open]="isMobileMenuOpen">
+    <div class="mobile-menu-content">
+      <a (click)="scrollToSection('inicio')" class="mobile-nav-link">
+        Inicio
+      </a>
+      <a (click)="scrollToSection('donaciones')" class="mobile-nav-link">
+        Donaciones
+      </a>
+      <a (click)="scrollToSection('impacto')" class="mobile-nav-link">
+        Nuestro Impacto
+      </a>
+      <a (click)="scrollToSection('comunidad')" class="mobile-nav-link">
+        Comunidad
+      </a>
+      <div class="mobile-auth-buttons">
+        <button routerLink="/login" class="btn-secondary w-full">
+          Iniciar Sesión
+        </button>
+        <button routerLink="/register" class="btn-primary w-full">
+          Registrarse
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

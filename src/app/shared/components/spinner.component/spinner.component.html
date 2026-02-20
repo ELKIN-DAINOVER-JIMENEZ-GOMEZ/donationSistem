@@ -1,0 +1,12 @@
+<div class="spinner-host" [class.spinner-overlay]="overlay">
+      <div class="spinner-wrap">
+        <svg class="spinner-svg" [ngClass]="'spinner-' + size"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/>
+        </svg>
+        <span class="spinner-label" *ngIf="label" [class.sr-only]="!showLabel">
+          {{ label }}
+        </span>
+      </div>
+    </div>

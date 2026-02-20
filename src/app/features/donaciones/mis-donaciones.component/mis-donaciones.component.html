@@ -1,0 +1,176 @@
+<div class="md-root">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <header class="md-header">
+    <div class="md-header-inner">
+      <div>
+        <h1>Mis Donaciones</h1>
+        <p>Rastrea el impacto de tu generosidad</p>
+      </div>
+      <a routerLink="/donaciones/crear" class="btn-new">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nueva donación
+      </a>
+    </div>
+  </header>
+
+  <!-- ══ STATS ════════════════════════════════════════════════ -->
+  <section class="stats-bar" *ngIf="!isLoading">
+    <div class="stat-card stat-main">
+      <div class="stat-icon-wrap green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div>
+        <p class="stat-lbl">Total donado</p>
+        <p class="stat-val">{{ formatMonto(totalDonado) }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap rose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <div>
+        <p class="stat-lbl">Confirmadas</p>
+        <p class="stat-val">{{ totalConfirmadas }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <p class="stat-lbl">En revisión</p>
+        <p class="stat-val">{{ totalPendientes }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-wrap blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div>
+        <p class="stat-lbl">Total registros</p>
+        <p class="stat-val">{{ donaciones.length }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FILTROS ═══════════════════════════════════════════════ -->
+  <section class="md-filters">
+    <!-- Búsqueda -->
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" [(ngModel)]="busqueda" placeholder="Buscar donación..." class="search-input"/>
+    </div>
+
+    <!-- Filtro estado -->
+    <div class="filter-group">
+      <button *ngFor="let f of ['TODOS','PENDIENTE','CONFIRMADA','RECHAZADA']"
+              class="filter-btn"
+              [class.active]="filtroEstado === f"
+              [class.state-pending]="f === 'PENDIENTE' && filtroEstado === f"
+              [class.state-confirmed]="f === 'CONFIRMADA' && filtroEstado === f"
+              [class.state-rejected]="f === 'RECHAZADA' && filtroEstado === f"
+              (click)="filtroEstado = $any(f)" type="button">
+        {{ f === 'TODOS' ? 'Todos' : f === 'PENDIENTE' ? 'Pendientes' : f === 'CONFIRMADA' ? 'Confirmadas' : 'Rechazadas' }}
+      </button>
+    </div>
+
+    <!-- Filtro tipo -->
+    <select class="filter-select" [(ngModel)]="filtroTipo">
+      <option value="TODOS">Todos los tipos</option>
+      <option value="MONETARIA">Monetaria</option>
+      <option value="ESPECIES">En Especies</option>
+      <option value="SERVICIOS">Servicios</option>
+    </select>
+  </section>
+
+  <!-- ══ LOADING ═══════════════════════════════════════════════ -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+  </div>
+
+  <!-- ══ LISTA ═════════════════════════════════════════════════ -->
+  <section class="md-list" *ngIf="!isLoading">
+
+    <!-- Vacío -->
+    <div class="empty-state" *ngIf="donacionesFiltradas.length === 0">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </div>
+      <h3>Sin donaciones</h3>
+      <p>{{ busqueda ? 'No encontramos donaciones con esa búsqueda' : 'Aún no tienes donaciones en esta categoría' }}</p>
+      <a routerLink="/donaciones/crear" class="btn-new-sm">Crear donación</a>
+    </div>
+
+    <!-- Cards -->
+    <div class="don-card" *ngFor="let don of donacionesFiltradas"
+         [class.expanded]="expandedId === don.id">
+
+      <!-- Header de la card -->
+      <div class="don-card-header" (click)="toggleExpand(don.id)">
+        <div class="don-tipo-icon" [class]="'tipo-' + don.tipo.toLowerCase()">
+          <svg *ngIf="don.tipo === 'MONETARIA'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <svg *ngIf="don.tipo === 'ESPECIES'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+          </svg>
+          <svg *ngIf="don.tipo === 'SERVICIOS'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+
+        <div class="don-info">
+          <div class="don-top-row">
+            <span class="don-tipo-lbl">{{ don.tipo === 'MONETARIA' ? '💰 Monetaria' : don.tipo === 'ESPECIES' ? '📦 Especies' : '🤝 Servicio' }}</span>
+            <span class="don-badge" [class]="'badge-' + don.estado.toLowerCase()">
+              <span class="badge-dot"></span>
+              {{ don.estado === 'PENDIENTE' ? 'Pendiente' : don.estado === 'CONFIRMADA' ? 'Confirmada' : 'Rechazada' }}
+            </span>
+          </div>
+          <p class="don-desc">{{ don.descripcion }}</p>
+          <div class="don-meta">
+            <span>{{ formatFecha(don.fechaDonacion) }}</span>
+            <span *ngIf="don.monto" class="don-monto">{{ formatMonto(don.monto) }}</span>
+          </div>
+        </div>
+
+        <button class="don-toggle" type="button" [class.open]="expandedId === don.id">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Detalle expandido -->
+      <div class="don-detail" *ngIf="expandedId === don.id">
+        <div class="detail-grid">
+          <div class="detail-item" *ngIf="don.tipo === 'ESPECIES' && don.detalleEspecies">
+            <p class="detail-key">Artículos donados</p>
+            <p class="detail-val">{{ don.detalleEspecies }}</p>
+          </div>
+          <div class="detail-item" *ngIf="don.fechaConfirmacion">
+            <p class="detail-key">Fecha de confirmación</p>
+            <p class="detail-val">{{ formatFecha(don.fechaConfirmacion) }}</p>
+          </div>
+          <div class="detail-item" *ngIf="don.comprobante">
+            <p class="detail-key">Comprobante</p>
+            <a [href]="don.comprobante" target="_blank" class="detail-link">Ver comprobante →</a>
+          </div>
+          <div class="detail-item nota" *ngIf="don.notas">
+            <p class="detail-key">Nota del administrador</p>
+            <p class="detail-val nota-text" [class.nota-rechazo]="don.estado === 'RECHAZADA'">{{ don.notas }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>

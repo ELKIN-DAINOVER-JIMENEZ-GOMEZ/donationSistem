@@ -1,0 +1,34 @@
+<div class="modal-backdrop" *ngIf="open" (click)="onBackdropClick($event)">
+      <div class="modal-box" role="dialog" [attr.aria-label]="title" aria-modal="true">
+
+        <!-- Ícono -->
+        <div class="modal-icon" [ngClass]="'modal-icon-' + variant">
+          <span *ngIf="variant === 'danger'">⚠️</span>
+          <span *ngIf="variant === 'warning'">🔔</span>
+          <span *ngIf="variant === 'info'">ℹ️</span>
+          <span *ngIf="variant === 'success'">✅</span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="modal-content">
+          <h3 class="modal-title">{{ title }}</h3>
+          <p class="modal-message">{{ message }}</p>
+          <ng-content></ng-content>
+        </div>
+
+        <!-- Acciones -->
+        <div class="modal-actions">
+          <app-button variant="secondary" (clicked)="cancelled.emit()" [disabled]="loading">
+            {{ cancelLabel }}
+          </app-button>
+          <app-button
+            [variant]="variant === 'danger' ? 'danger' : 'primary'"
+            [loading]="loading"
+            [loadingText]="loadingText"
+            (clicked)="confirmed.emit()">
+            {{ confirmLabel }}
+          </app-button>
+        </div>
+
+      </div>
+    </div>

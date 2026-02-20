@@ -1,0 +1,16 @@
+<button
+      class="btn"
+      [ngClass]="['btn-' + variant, 'btn-' + size]"
+      [disabled]="disabled || loading"
+      [type]="type"
+      (click)="!disabled && !loading && clicked.emit($event)">
+
+      <!-- Spinner de carga -->
+      <svg *ngIf="loading" class="btn-spinner"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/>
+      </svg>
+
+      <ng-content *ngIf="!loading"></ng-content>
+      <span *ngIf="loading && loadingText" class="btn-loading-text">{{ loadingText }}</span>
+    </button>

@@ -1,0 +1,132 @@
+.don-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .don-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Header */
+    .don-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .don-user-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .don-user-name {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: #1e293b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .don-user-email {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Body */
+    .don-tipo-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .don-tipo-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .don-monto {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .don-descripcion {
+      font-size: 0.85rem;
+      color: #475569;
+      margin: 0;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .don-especies {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0;
+      background: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border-left: 3px solid #e2e8f0;
+    }
+
+    /* Footer */
+    .don-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .don-fecha {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .don-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .don-btn {
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .don-btn:hover { opacity: 0.85; }
+    .don-btn-confirm { background: #dcfce7; color: #15803d; }
+    .don-btn-reject  { background: #fee2e2; color: #b91c1c; }
+    .don-confirmed-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: #15803d;
+    }
+    .don-conf-label { font-weight: 600; }
+
+    /* Notas */
+    .don-notas {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #64748b;
+      background: #f8fafc;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .don-notas-icon { flex-shrink: 0; }

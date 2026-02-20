@@ -1,0 +1,227 @@
+/* Navbar Base Styles */
+.navbar {
+  background: rgba(10, 15, 20, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.navbar.scrolled {
+  background: rgba(10, 15, 20, 0.95);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo Styles */
+.logo-circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, #10b981, #0d9488);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s;
+}
+
+.group:hover .logo-circle {
+  transform: scale(1.1) rotate(6deg);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #34d399, #2dd4bf, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.025em;
+  transition: all 0.3s;
+}
+
+.group:hover .logo-text {
+  letter-spacing: 0.025em;
+}
+
+/* Navigation Links */
+.nav-link {
+  color: #d1d5db;
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-link:hover {
+  color: #34d399;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -0.25rem;
+  left: 0;
+  width: 0;
+  height: 0.125rem;
+  background: linear-gradient(to right, #34d399, #2dd4bf);
+  transition: all 0.3s;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: linear-gradient(to right, #10b981, #0d9488);
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s;
+  cursor: pointer !important;
+  border: none;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4);
+  transform: scale(1.05);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+  cursor: pointer !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #34d399;
+}
+
+.btn-secondary:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+  cursor: pointer !important;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.line {
+  width: 1.25rem;
+  height: 0.125rem;
+  background: #d1d5db;
+  border-radius: 9999px;
+  transition: all 0.3s;
+}
+
+.mobile-menu-btn.active .line-1 {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.mobile-menu-btn.active .line-2 {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.mobile-menu-btn.active .line-3 {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 5rem;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to bottom, #0f172a, #020617);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(0);
+  transition: all 0.5s ease-out;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+}
+
+.mobile-menu.open {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.mobile-menu-content {
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mobile-nav-link {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #d1d5db;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+  cursor: pointer !important;
+}
+
+.mobile-nav-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #34d399;
+  padding-left: 1.5rem;
+}
+
+.mobile-auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Cursor Pointer Override for All Interactive Elements */
+button, a, [routerLink], [routerlink], .nav-link, .mobile-nav-link {
+  cursor: pointer !important;
+}
+
+button:hover, a:hover, [routerLink]:hover, [routerlink]:hover {
+  cursor: pointer !important;
+}
