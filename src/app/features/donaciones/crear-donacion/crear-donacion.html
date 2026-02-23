@@ -53,6 +53,41 @@
       </div>
     </div>
 
+      <!-- ── BADGE: tipo preseleccionado desde petición ─── -->
+      <div class="tipo-presel-banner" *ngIf="tipoPreseleccionado && tipoActualMeta">
+        <div class="tipo-presel-icon"
+             [style.background]="tipoActualMeta.color + '18'"
+             [style.color]="tipoActualMeta.color">
+          <svg *ngIf="tipoActualMeta.icon === 'money'" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <svg *ngIf="tipoActualMeta.icon === 'box'" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
+            <line x1="10" y1="12" x2="14" y2="12"/>
+          </svg>
+          <svg *ngIf="tipoActualMeta.icon === 'handshake'" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5z"/>
+            <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+          </svg>
+        </div>
+        <div class="tipo-presel-info">
+          <span class="tipo-presel-label">Tipo de donación</span>
+          <span class="tipo-presel-valor" [style.color]="tipoActualMeta.color">
+            {{ tipoActualMeta.label }}
+          </span>
+        </div>
+        <div class="tipo-presel-check">
+          <svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,10 8,14 16,6"/>
+          </svg>
+        </div>
+      </div>
+
     <div class="cd-body">
 
       <!-- ── PASO 1: Tipo ─────────────────────────────────── -->

@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 
 <main class="main-content">
-  
+
   <!-- Hero Section -->
   <section id="inicio" class="hero-section">
     <div class="hero-background">
@@ -16,19 +16,19 @@
         <span class="badge-dot"></span>
         Transformando Vidas Juntos
       </div>
-      
+
       <h1 class="hero-title">
         Dona con
         <span class="title-highlight">Propósito</span><br>
         Cambia con
         <span class="title-highlight">Impacto</span>
       </h1>
-      
+
       <p class="hero-description">
         Únete a nuestra comunidad de personas comprometidas con generar un cambio real.
         Cada donación cuenta una historia de transformación.
       </p>
-      
+
       <div class="hero-buttons">
         <button routerLink="/register" class="btn-hero-primary">
           <span>Comenzar Ahora</span>
@@ -38,9 +38,9 @@
         </button>
         <button (click)="scrollToSection('donaciones')" class="btn-hero-secondary">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>Ver Cómo Funciona</span>
@@ -86,7 +86,7 @@
       </div>
 
       <div class="features-grid">
-        <div *ngFor="let feature of features; let i = index" 
+        <div *ngFor="let feature of features; let i = index"
              class="feature-card"
              [style.animation-delay.ms]="i * 100">
           <div class="feature-icon-wrapper">
@@ -104,18 +104,72 @@
     </div>
   </section>
 
+  <!-- ══ SECCIÓN PETICIONES DE LÍDERES ══════════════════════════════════════ -->
+  <section class="peticiones-section" *ngIf="peticiones.length > 0">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-badge">Peticiones de la Comunidad</span>
+        <h2 class="section-title">
+          Líderes que necesitan
+          <span class="text-gradient">tu apoyo</span>
+        </h2>
+        <p class="section-description">
+          Líderes sociales han publicado estas solicitudes. Haz tu donación y genera impacto real.
+        </p>
+      </div>
+
+      <div class="peticiones-grid">
+        <div class="peticion-card" *ngFor="let p of peticiones" (click)="abrirModal(p)">
+
+          <!-- Imagen -->
+          <div class="peticion-img-wrap">
+            <img *ngIf="p.imagenUrl" [src]="p.imagenUrl" [alt]="p.titulo" class="peticion-img"/>
+            <div *ngIf="!p.imagenUrl" class="peticion-img-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+            <span class="tipo-badge" [style.background]="getTipoBadgeColor(p.tipoDonacion)">
+              {{ getTipoLabel(p.tipoDonacion) }}
+            </span>
+          </div>
+
+          <!-- Contenido -->
+          <div class="peticion-body">
+            <h3 class="peticion-titulo">{{ p.titulo }}</h3>
+            <p class="peticion-desc">{{ p.descripcion }}</p>
+
+            <div class="peticion-autor">
+              <div class="autor-avatar">{{ p.autorNombre.charAt(0).toUpperCase() }}</div>
+              <div>
+                <span class="autor-nombre">{{ p.autorNombre }}</span>
+                <span class="autor-org">{{ p.autorOrganizacion }}</span>
+              </div>
+            </div>
+
+            <button class="btn-donar" (click)="irADonar(p, $event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              Realizar Donación
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Impact Section -->
   <section id="impacto" class="impact-section">
     <div class="section-container">
       <div class="impact-content">
         <div class="impact-visual">
           <div class="impact-image">
-            <div class="image-placeholder">
-              <svg class="w-32 h-32 text-emerald-400/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
+              <img src="assets/photo1.jpg" alt="photo1" class="impact-photo" />
           </div>
           <div class="impact-stats-float">
             <div class="float-stat">
@@ -172,7 +226,7 @@
       </div>
 
       <div class="testimonials-grid">
-        <div *ngFor="let testimonial of testimonials; let i = index" 
+        <div *ngFor="let testimonial of testimonials; let i = index"
              class="testimonial-card"
              [style.animation-delay.ms]="i * 150">
           <div class="testimonial-content">
@@ -202,9 +256,7 @@
         <div class="cta-orb orb-1"></div>
         <div class="cta-orb orb-2"></div>
       </div>
-      <h2 class="cta-title">
-        ¿Listo para Hacer la Diferencia?
-      </h2>
+      <h2 class="cta-title">¿Listo para Hacer la Diferencia?</h2>
       <p class="cta-description">
         Únete a nuestra comunidad hoy y comienza tu viaje de transformación social.
       </p>
@@ -224,7 +276,7 @@
         <div class="footer-logo">
           <div class="logo-circle">
             <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" 
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
@@ -234,7 +286,7 @@
           Transformando vidas a través de la generosidad y el compromiso social.
         </p>
       </div>
-      
+
       <div class="footer-links">
         <div class="footer-column">
           <h4 class="footer-column-title">Plataforma</h4>
@@ -256,7 +308,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="footer-bottom">
       <p class="footer-copyright">© 2024 DonaVida. Todos los derechos reservados.</p>
       <div class="footer-social">
@@ -268,3 +320,51 @@
   </footer>
 
 </main>
+
+<!-- ══ MODAL DETALLE PETICIÓN ══════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()" *ngIf="peticionSeleccionada">
+
+    <button class="modal-close" (click)="cerrarModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <img *ngIf="peticionSeleccionada.imagenUrl"
+         [src]="peticionSeleccionada.imagenUrl"
+         [alt]="peticionSeleccionada.titulo"
+         class="modal-img"/>
+
+    <div class="modal-content">
+      <span class="modal-badge"
+            [style.background]="getTipoBadgeColor(peticionSeleccionada.tipoDonacion)">
+        {{ getTipoLabel(peticionSeleccionada.tipoDonacion) }}
+      </span>
+
+      <h2 class="modal-titulo">{{ peticionSeleccionada.titulo }}</h2>
+      <p class="modal-desc">{{ peticionSeleccionada.descripcion }}</p>
+
+      <div class="modal-autor">
+        <div class="autor-avatar lg">{{ peticionSeleccionada.autorNombre.charAt(0).toUpperCase() }}</div>
+        <div>
+          <span class="autor-nombre">{{ peticionSeleccionada.autorNombre }}</span>
+          <span class="autor-org">{{ peticionSeleccionada.autorOrganizacion }}</span>
+        </div>
+        <span class="modal-fecha">
+          {{ peticionSeleccionada.fechaPublicacion | date:'mediumDate':'':'es' }}
+        </span>
+      </div>
+
+      <button class="btn-donar modal-btn-donar"
+              (click)="irADonar(peticionSeleccionada!, $event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Realizar Donación
+      </button>
+    </div>
+  </div>
+</div>

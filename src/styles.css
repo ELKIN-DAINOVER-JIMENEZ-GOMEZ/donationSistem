@@ -1,3 +1,107 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles with theme variables */
 
 @import "tailwindcss";
+
+/* ── Dark theme (default) ─────────────────────────────────────────── */
+:root {
+  --bg-primary: #0a0f14;
+  --bg-secondary: #0f172a;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --bg-glass: rgba(10, 15, 20, 0.7);
+  --bg-glass-scrolled: rgba(10, 15, 20, 0.95);
+
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --text-accent: #34d399;
+
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-alt: #10b981;          /* verde → se cambia en light */
+  --accent-gradient-from: #10b981;
+  --accent-gradient-to: #0d9488;
+  --accent-logo-from: #34d399;
+  --accent-logo-to: #2dd4bf;
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(52, 211, 153, 0.5);
+
+  --btn-secondary-bg: rgba(255, 255, 255, 0.05);
+  --btn-secondary-text: #d1d5db;
+  --btn-secondary-border: rgba(255, 255, 255, 0.1);
+  --btn-secondary-hover-bg: rgba(255, 255, 255, 0.1);
+  --btn-secondary-hover-text: #34d399;
+
+  --orb-1: rgba(16, 185, 129, 0.15);
+  --orb-2: rgba(13, 148, 136, 0.1);
+  --orb-3: rgba(6, 78, 59, 0.08);
+
+  --hero-bg: #020617;
+  --shadow-accent: rgba(16, 185, 129, 0.3);
+
+  --mobile-menu-bg: linear-gradient(to bottom, #0f172a, #020617);
+  --footer-bg: #020617;
+
+  --theme-btn-bg: rgba(255, 255, 255, 0.06);
+  --theme-btn-border: rgba(255, 255, 255, 0.12);
+  --theme-btn-text: #fbbf24;
+}
+
+/* ── Light theme ──────────────────────────────────────────────────── */
+body.light-mode {
+  --bg-primary: #f0f9ff;
+  --bg-secondary: #e0f2fe;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-glass: rgba(240, 249, 255, 0.85);
+  --bg-glass-scrolled: rgba(240, 249, 255, 0.97);
+
+  --text-primary: #0c1a2e;
+  --text-secondary: #1e3a5f;
+  --text-muted: #4a6fa5;
+  --text-accent: #0284c7;
+
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  --accent-alt: #0ea5e9;
+  --accent-gradient-from: #0284c7;
+  --accent-gradient-to: #0369a1;
+  --accent-logo-from: #38bdf8;
+  --accent-logo-to: #0ea5e9;
+
+  --border-color: rgba(2, 132, 199, 0.15);
+  --border-hover: rgba(2, 132, 199, 0.6);
+
+  --btn-secondary-bg: rgba(2, 132, 199, 0.08);
+  --btn-secondary-text: #1e3a5f;
+  --btn-secondary-border: rgba(2, 132, 199, 0.2);
+  --btn-secondary-hover-bg: rgba(2, 132, 199, 0.15);
+  --btn-secondary-hover-text: #0284c7;
+
+  --orb-1: rgba(2, 132, 199, 0.12);
+  --orb-2: rgba(14, 165, 233, 0.08);
+  --orb-3: rgba(56, 189, 248, 0.06);
+
+  --hero-bg: #e0f2fe;
+  --shadow-accent: rgba(2, 132, 199, 0.25);
+
+  --mobile-menu-bg: linear-gradient(to bottom, #e0f2fe, #bae6fd);
+  --footer-bg: #0c1a2e;
+
+  --theme-btn-bg: rgba(2, 132, 199, 0.1);
+  --theme-btn-border: rgba(2, 132, 199, 0.25);
+  --theme-btn-text: #0369a1;
+}
+
+/* ── Base resets ──────────────────────────────────────────────────── */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+* {
+  transition: background-color 0.35s ease, color 0.35s ease,
+              border-color 0.35s ease, box-shadow 0.35s ease;
+}

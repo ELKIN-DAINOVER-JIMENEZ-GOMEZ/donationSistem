@@ -369,3 +369,72 @@
   .cd-nav { flex-direction: column-reverse; }
   .btn-back, .btn-primary { width: 100%; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   AÑADIR AL FINAL DE crear-donacion.css
+   Banner de tipo pre-seleccionado (viene de una petición)
+══════════════════════════════════════════════════════════════ */
+
+.tipo-presel-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 0 1.5rem 0 1.5rem;
+  animation: slideUp 0.4s ease both;
+}
+
+.tipo-presel-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tipo-presel-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.tipo-presel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+}
+
+.tipo-presel-label {
+  font-size: 0.72rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.tipo-presel-valor {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.tipo-presel-check {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+.tipo-presel-check svg {
+  width: 14px;
+  height: 14px;
+}

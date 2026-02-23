@@ -1,7 +1,7 @@
 <div class="pf-root">
 
-  <!-- ══ LOADING ═══════════════════════════════════════════════ -->
-  <div class="pf-loading" *ngIf="isLoading">
+  <!-- ══ LOADING ══════════════════════════════════════════════ -->
+  <div class="pf-loading" *ngIf="isLoading()">
     <div class="skel-avatar"></div>
     <div class="skel-line w60"></div>
     <div class="skel-line w40"></div>
@@ -10,11 +10,15 @@
   </div>
 
   <!-- ══ CONTENIDO ════════════════════════════════════════════ -->
-  <ng-container *ngIf="!isLoading">
+  <ng-container *ngIf="!isLoading() && usuario">
 
     <!-- Hero / Avatar section -->
     <div class="pf-hero">
-      <div class="pf-hero-bg"></div>
+      <div class="pf-hero-bg">
+        <div class="pf-blob pf-blob-1"></div>
+        <div class="pf-blob pf-blob-2"></div>
+        <div class="pf-dot-grid"></div>
+      </div>
 
       <div class="pf-hero-inner">
         <div class="pf-avatar-area">
@@ -25,36 +29,37 @@
         </div>
 
         <div class="pf-hero-info">
-          <h1>{{ fullName }}</h1>
-          <span class="rol-badge" [class]="rolBadgeClass">{{ rolLabel }}</span>
-          <p class="pf-since">Miembro desde {{ formatFecha(usuario.fechaRegistro) }}</p>
+          <h1>{{ usuario.nombre }}</h1>
+          <span class="rol-badge" [ngClass]="rolBadgeClass">{{ rolLabel }}</span>
+          <p class="pf-since" *ngIf="usuario.fechaRegistro">
+            Miembro desde {{ formatFecha(usuario.fechaRegistro) }}
+          </p>
         </div>
 
         <!-- Stats rápidas -->
-        <div class="pf-quick-stats">
+        <div class="pf-quick-stats" *ngIf="usuario.totalDonado !== undefined || usuario.cantidadDonaciones !== undefined">
           <div class="qs-item" *ngIf="usuario.totalDonado !== undefined">
-            <span class="qs-val">{{ formatMonto(usuario.totalDonado) }}</span>
+            <span class="qs-val">{{ formatMonto(usuario.totalDonado!) }}</span>
             <span class="qs-lbl">Total donado</span>
           </div>
-          <div class="qs-div" *ngIf="usuario.cantidadDonaciones !== undefined"></div>
+          <div class="qs-div" *ngIf="usuario.totalDonado !== undefined && usuario.cantidadDonaciones !== undefined"></div>
           <div class="qs-item" *ngIf="usuario.cantidadDonaciones !== undefined">
             <span class="qs-val">{{ usuario.cantidadDonaciones }}</span>
             <span class="qs-lbl">Donaciones</span>
           </div>
-          <div class="qs-div" *ngIf="usuario.posicionRanking !== undefined"></div>
+          <div class="qs-div" *ngIf="usuario.cantidadDonaciones !== undefined && usuario.posicionRanking !== undefined"></div>
           <div class="qs-item" *ngIf="usuario.posicionRanking !== undefined">
             <span class="qs-val">#{{ usuario.posicionRanking }}</span>
             <span class="qs-lbl">En ranking</span>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- ── Tabs ──────────────────────────────────────────────── -->
+    <!-- ── Tabs ─────────────────────────────────────────────── -->
     <div class="pf-tabs-wrap">
       <div class="pf-tabs">
-        <button class="tab-btn" [class.active]="activeTab === 'perfil'"   (click)="setTab('perfil')"   type="button">
+        <button class="tab-btn" [class.active]="activeTab === 'perfil'"    (click)="setTab('perfil')"    type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
@@ -77,83 +82,71 @@
 
     <!-- Mensajes globales -->
     <div class="pf-messages">
-      <div class="msg-success" *ngIf="successMessage">
+      <div class="msg-success" *ngIf="successMessage()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        {{ successMessage }}
+        {{ successMessage() }}
       </div>
-      <div class="msg-error" *ngIf="errorMessage">
+      <div class="msg-error" *ngIf="errorMessage()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        {{ errorMessage }}
+        {{ errorMessage() }}
       </div>
     </div>
 
     <div class="pf-content">
 
-      <!-- ── TAB: Datos personales ────────────────────────────── -->
+      <!-- ── TAB: Datos personales ─────────────────────────── -->
       <div class="pf-panel" *ngIf="activeTab === 'perfil'">
         <div class="panel-title">Información personal</div>
 
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Nombre <span class="req">*</span></label>
-            <input type="text" [(ngModel)]="form.nombre" placeholder="Tu nombre" class="f-input"/>
-          </div>
-          <div class="form-field">
-            <label>Apellido</label>
-            <input type="text" [(ngModel)]="form.apellido" placeholder="Tu apellido" class="f-input"/>
+        <!-- Nombre completo (campo único del backend) -->
+        <div class="form-field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <div class="f-inner" [class.has-value]="form.nombre">
+            <span class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" [(ngModel)]="form.nombre" placeholder="Tu nombre completo" class="f-input"/>
           </div>
         </div>
 
+        <!-- Correo -->
         <div class="form-field">
           <label>Correo electrónico <span class="req">*</span></label>
-          <div class="f-inner">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" [(ngModel)]="form.email" placeholder="tu@correo.com" class="f-input with-icon"/>
+          <div class="f-inner" [class.has-value]="form.email">
+            <span class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+            <input type="email" [(ngModel)]="form.email" placeholder="tu@correo.com" class="f-input"/>
           </div>
         </div>
 
-        <div class="form-field">
-          <label>Teléfono <span class="opt">(opcional)</span></label>
-          <div class="f-inner">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.97-.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            <input type="tel" [(ngModel)]="form.telefono" placeholder="+57 300 000 0000" class="f-input with-icon"/>
-          </div>
-        </div>
-
-        <div class="form-field">
-          <label>Organización <span class="opt">(opcional)</span></label>
-          <div class="f-inner">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/>
-            </svg>
-            <input type="text" [(ngModel)]="form.organizacion" placeholder="Fundación / Empresa / Comunidad" class="f-input with-icon"/>
-          </div>
-        </div>
-
+        <!-- Rol (solo lectura) -->
         <div class="form-field">
           <label>Rol</label>
           <div class="rol-display">
-            <span class="rol-badge" [class]="rolBadgeClass">{{ rolLabel }}</span>
-            <span class="rol-note">El rol solo puede ser cambiado por un administrador</span>
+            <span class="rol-badge" [ngClass]="rolBadgeClass">{{ rolLabel }}</span>
+            <span class="rol-note">El rol es asignado por el administrador</span>
           </div>
         </div>
 
         <div class="form-actions">
-          <button class="btn-save" (click)="onSavePerfil()" [disabled]="isSaving" type="button">
-            <svg *ngIf="isSaving" class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/></svg>
-            <svg *ngIf="!isSaving" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <button class="btn-save" (click)="onSavePerfil()" [disabled]="isSaving()" type="button">
+            <svg *ngIf="isSaving()" class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/>
+            </svg>
+            <svg *ngIf="!isSaving()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
             </svg>
-            {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+            {{ isSaving() ? 'Guardando...' : 'Guardar cambios' }}
           </button>
         </div>
       </div>
 
-      <!-- ── TAB: Seguridad ────────────────────────────────────── -->
+      <!-- ── TAB: Seguridad ─────────────────────────────────── -->
       <div class="pf-panel" *ngIf="activeTab === 'seguridad'">
         <div class="panel-title">Cambiar contraseña</div>
 
@@ -161,18 +154,21 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
-          <p>Usa una contraseña única, de al menos 8 caracteres con letras, números y símbolos.</p>
+          <p>Usa una contraseña única de al menos 8 caracteres con letras, números y símbolos.</p>
         </div>
 
+        <!-- Contraseña actual -->
         <div class="form-field">
           <label>Contraseña actual <span class="req">*</span></label>
           <div class="f-inner">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+            <span class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
             <input [type]="showPass.actual ? 'text' : 'password'"
                    [(ngModel)]="passForm.actual"
-                   placeholder="Tu contraseña actual" class="f-input with-icon"/>
+                   placeholder="Tu contraseña actual" class="f-input"/>
             <button type="button" class="eye-btn" (click)="showPass.actual = !showPass.actual">
               <svg *ngIf="!showPass.actual" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <svg *ngIf="showPass.actual"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
@@ -180,67 +176,72 @@
           </div>
         </div>
 
+        <!-- Nueva contraseña -->
         <div class="form-field">
           <label>Nueva contraseña <span class="req">*</span></label>
           <div class="f-inner">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+            <span class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
             <input [type]="showPass.nueva ? 'text' : 'password'"
                    [(ngModel)]="passForm.nueva"
-                   placeholder="Mínimo 8 caracteres" class="f-input with-icon"/>
+                   placeholder="Mínimo 8 caracteres" class="f-input"/>
             <button type="button" class="eye-btn" (click)="showPass.nueva = !showPass.nueva">
               <svg *ngIf="!showPass.nueva" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <svg *ngIf="showPass.nueva"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
-
           <!-- Fortaleza -->
-          <div class="strength-row" *ngIf="passForm.nueva">
+          <div class="strength-wrap" *ngIf="passForm.nueva">
             <div class="strength-bars">
-              <div class="s-bar" [class]="passwordStrength.score >= 1 ? passwordStrength.cls : ''"></div>
-              <div class="s-bar" [class]="passwordStrength.score >= 2 ? passwordStrength.cls : ''"></div>
-              <div class="s-bar" [class]="passwordStrength.score >= 3 ? passwordStrength.cls : ''"></div>
-              <div class="s-bar" [class]="passwordStrength.score >= 4 ? passwordStrength.cls : ''"></div>
-              <div class="s-bar" [class]="passwordStrength.score >= 5 ? passwordStrength.cls : ''"></div>
+              <div class="sbar" [class]="passwordStrength.score >= 1 ? passwordStrength.cls : ''"></div>
+              <div class="sbar" [class]="passwordStrength.score >= 2 ? passwordStrength.cls : ''"></div>
+              <div class="sbar" [class]="passwordStrength.score >= 3 ? passwordStrength.cls : ''"></div>
+              <div class="sbar" [class]="passwordStrength.score >= 4 ? passwordStrength.cls : ''"></div>
+              <div class="sbar" [class]="passwordStrength.score >= 5 ? passwordStrength.cls : ''"></div>
             </div>
-            <span class="strength-lbl">{{ passwordStrength.label }}</span>
+            <span class="strength-label">{{ passwordStrength.label }}</span>
           </div>
         </div>
 
+        <!-- Confirmar contraseña -->
         <div class="form-field">
           <label>Confirmar contraseña <span class="req">*</span></label>
           <div class="f-inner" [class.match]="passwordsMatch" [class.nomatch]="passForm.confirmar && !passwordsMatch">
-            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+            <span class="f-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
             <input [type]="showPass.confirmar ? 'text' : 'password'"
                    [(ngModel)]="passForm.confirmar"
-                   placeholder="Repite la nueva contraseña" class="f-input with-icon"/>
+                   placeholder="Repite la nueva contraseña" class="f-input"/>
             <button type="button" class="eye-btn" (click)="showPass.confirmar = !showPass.confirmar">
               <svg *ngIf="!showPass.confirmar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <svg *ngIf="showPass.confirmar"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
-          <p class="match-ok" *ngIf="passwordsMatch">✓ Las contraseñas coinciden</p>
-          <p class="match-err" *ngIf="passForm.confirmar && !passwordsMatch">✗ Las contraseñas no coinciden</p>
+          <p class="match-msg match-ok"  *ngIf="passwordsMatch">✓ Las contraseñas coinciden</p>
+          <p class="match-msg match-err" *ngIf="passForm.confirmar && !passwordsMatch">✗ Las contraseñas no coinciden</p>
         </div>
 
         <div class="form-actions">
-          <button class="btn-save" (click)="onSavePassword()" [disabled]="isSavingPass" type="button">
-            <svg *ngIf="isSavingPass" class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/></svg>
-            {{ isSavingPass ? 'Actualizando...' : 'Actualizar contraseña' }}
+          <button class="btn-save" (click)="onSavePassword()" [disabled]="isSavingPass()" type="button">
+            <svg *ngIf="isSavingPass()" class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/></svg>
+            {{ isSavingPass() ? 'Actualizando...' : 'Actualizar contraseña' }}
           </button>
         </div>
       </div>
 
-      <!-- ── TAB: Actividad ────────────────────────────────────── -->
+      <!-- ── TAB: Actividad ─────────────────────────────────── -->
       <div class="pf-panel" *ngIf="activeTab === 'actividad'">
         <div class="panel-title">Tu actividad</div>
 
         <div class="activity-cards">
           <a routerLink="/donaciones/mis-donaciones" class="act-card">
-            <div class="act-icon rose">
+            <div class="act-icon ico-rose">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
@@ -249,24 +250,55 @@
               <p class="act-title">Mis Donaciones</p>
               <p class="act-desc">Revisa el historial y estado de tus donaciones</p>
             </div>
-            <span class="act-count rose-count">{{ usuario.cantidadDonaciones }}</span>
+            <span class="act-count rose-count" *ngIf="usuario.cantidadDonaciones !== undefined">
+              {{ usuario.cantidadDonaciones }}
+            </span>
+            <svg class="act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+            </svg>
           </a>
 
           <a routerLink="/donaciones/ranking" class="act-card">
-            <div class="act-icon amber">
+            <div class="act-icon ico-amber">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="18 20 22 20 22 8 18 8 18 20"/><polyline points="14 20 18 20 18 12 14 12 14 20"/><polyline points="10 20 14 20 14 4 10 4 10 20"/><polyline points="6 20 10 20 10 16 6 16 6 20"/><line x1="2" y1="20" x2="22" y2="20"/>
+                <polyline points="18 20 22 20 22 8 18 8 18 20"/><polyline points="14 20 18 20 18 12 14 12 14 20"/>
+                <polyline points="10 20 14 20 14 4 10 4 10 20"/><polyline points="6 20 10 20 10 16 6 16 6 20"/>
+                <line x1="2" y1="20" x2="22" y2="20"/>
               </svg>
             </div>
             <div class="act-info">
               <p class="act-title">Ranking de Donantes</p>
               <p class="act-desc">Ve tu posición y la de otros donantes</p>
             </div>
-            <span class="act-count amber-count" *ngIf="usuario.posicionRanking">#{{ usuario.posicionRanking }}</span>
+            <span class="act-count amber-count" *ngIf="usuario.posicionRanking !== undefined">
+              #{{ usuario.posicionRanking }}
+            </span>
+            <svg class="act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+            </svg>
           </a>
+            
+           <a routerLink="/peticiones/realizar" class="act-card"
+   *ngIf="usuario.rol === 'LIDER_SOCIAL'">
+  <div class="act-icon ico-green">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  </div>
+  <div class="act-info">
+    <p class="act-title">Realizar Petición</p>
+    <p class="act-desc">Publica una solicitud de donación para tu comunidad</p>
+  </div>
+  <svg class="act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+  </svg>
+</a>
 
           <a routerLink="/donaciones/crear" class="act-card act-cta">
-            <div class="act-icon emerald">
+            <div class="act-icon ico-emerald">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
@@ -279,6 +311,8 @@
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
             </svg>
           </a>
+
+         
         </div>
 
       </div>

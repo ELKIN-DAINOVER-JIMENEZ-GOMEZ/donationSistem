@@ -1,7 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { NavbarComponent } from '../navbar.components/navbar.components';
+import { AuthService } from '../core/services/auth.service';
+
+const STORAGE_KEY = 'donavida_peticiones';
+
+export interface Peticion {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  tipoDonacion: 'MONETARIA' | 'ESPECIES' | 'SERVICIOS';
+  imagenUrl: string | null;
+  autorNombre: string;
+  autorOrganizacion: string;
+  fechaPublicacion: string;
+}
 
 interface Stat {
   value: string;
@@ -32,7 +46,16 @@ interface Testimonial {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  
+
+  private router      = inject(Router);
+  private authService = inject(AuthService);
+
+  // ── Peticiones ────────────────────────────────────────────────────────────
+  peticiones: Peticion[] = [];
+  peticionSeleccionada: Peticion | null = null;
+  mostrarModal = false;
+
+  // ── Datos existentes ──────────────────────────────────────────────────────
   stats: Stat[] = [
     {
       value: '$2.5M+',
@@ -102,26 +125,103 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
-  ngOnInit(): void { // Inicia las animaciones de los contadores al cargar el componente
+  // ── Ciclo de vida ─────────────────────────────────────────────────────────
+
+  ngOnInit(): void {
+    this.cargarPeticiones();
     this.startCounterAnimations();
   }
 
-  startCounterAnimations(): void {// Simulación de animación de conteo
-    // Animación simple de aparición
+  cargarPeticiones(): void {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      this.peticiones = raw ? JSON.parse(raw) : [];
+    } catch {
+      this.peticiones = [];
+    }
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────
+
+  abrirModal(peticion: Peticion): void {
+    this.peticionSeleccionada = peticion;
+    this.mostrarModal = true;
+  }
+
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.peticionSeleccionada = null;
+  }
+
+  /**
+   * Navega a /donaciones/crear con el tipo pre-seleccionado.
+   * Si no hay sesión activa, redirige a /login con returnUrl
+   * para que al volver el usuario aterrice en el formulario correcto.
+   */
+  irADonar(peticion: Peticion, event: MouseEvent): void {
+    event.stopPropagation();
+    this.cerrarModal();
+
+    const sesion = this.authService.usuario();
+
+    if (!sesion) {
+      // No hay sesión: guardamos la intención y mandamos a login
+      this.router.navigate(['/login'], {
+        queryParams: {
+          returnUrl: '/donaciones/crear',
+          tipo:      peticion.tipoDonacion,
+          peticion:  peticion.titulo,
+          autor:     peticion.autorNombre
+        }
+      });
+      return;
+    }
+
+    // Hay sesión: navegar directamente al formulario
+    this.router.navigate(['/donaciones/crear'], {
+      queryParams: {
+        tipo:     peticion.tipoDonacion,
+        peticion: peticion.titulo,
+        autor:    peticion.autorNombre
+      }
+    });
+  }
+
+  // ── Helpers visuales ──────────────────────────────────────────────────────
+
+  getTipoBadgeColor(tipo: string): string {
+    const colores: Record<string, string> = {
+      MONETARIA: '#10b981',
+      ESPECIES:  '#f59e0b',
+      SERVICIOS: '#3b82f6'
+    };
+    return colores[tipo] || '#6b7280';
+  }
+
+  getTipoLabel(tipo: string): string {
+    const labels: Record<string, string> = {
+      MONETARIA: 'Monetaria',
+      ESPECIES:  'En Especies',
+      SERVICIOS: 'Servicio'
+    };
+    return labels[tipo] || tipo;
+  }
+
+  // ── Animaciones ───────────────────────────────────────────────────────────
+
+  startCounterAnimations(): void {
     setTimeout(() => {
       const elements = document.querySelectorAll('.animate-fade-in');
       elements.forEach((el, index) => {
-        setTimeout(() => {
-          el.classList.add('visible');
-        }, index * 100);
+        setTimeout(() => el.classList.add('visible'), index * 100);
       });
     }, 100);
   }
 
   scrollToSection(sectionId: string): void {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
-}
 }

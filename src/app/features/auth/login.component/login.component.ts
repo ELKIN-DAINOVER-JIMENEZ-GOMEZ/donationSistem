@@ -65,7 +65,7 @@ export class LoginComponent {
       next: () => {
         this.isLoading = false;
         // Redirigir a la URL original o al dashboard
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/usuarios/perfil';
         this.router.navigateByUrl(returnUrl);
         this.notificaciones.exito('¡Bienvenido!', `Hola de nuevo.`);
       },

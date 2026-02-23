@@ -16,7 +16,10 @@ import { AuthService } from '../services/auth.service';
  * Responsabilidades:
  *  1. Agrega el header "Authorization: Bearer <token>" a cada request saliente.
  *  2. Si el backend responde 401, limpia la sesión y redirige a /login.
- *  3. Rutas públicas (whitelist) pasan sin token aunque el usuario esté logueado.
+ *  3. Si el backend responde 403, reenvía el error al componente (que mostrará
+ *     el mensaje a través del errorInterceptor / NotificacionService).
+ *     ⚠️ NO redirige a /sin-permisos porque esa ruta no existe.
+ *  4. Rutas públicas (whitelist) pasan sin token aunque el usuario esté logueado.
  */
 
 /** Rutas que NO necesitan token */
@@ -51,25 +54,18 @@ export const jwtInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
 
       if (error.status === 401) {
-        // Token expirado o inválido → limpiar sesión
+        // Token expirado o inválido → limpiar sesión y redirigir al login
         authService.logout();
         router.navigate(['/login'], {
           queryParams: { sessionExpired: 'true' }
         });
       }
 
-      if (error.status === 403) {
-        // Sin permisos para el recurso
-        router.navigate(['/sin-permisos']);
-      }
+      // 403: sin permisos → el errorInterceptor muestra la notificación toast.
+      // No redirigimos porque /sin-permisos no está en las rutas de la app.
 
       return throwError(() => error);
     })
   );
 };
-
-
-
-
-
 

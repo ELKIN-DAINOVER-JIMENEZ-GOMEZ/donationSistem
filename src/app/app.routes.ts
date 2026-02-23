@@ -53,6 +53,7 @@ export const routes: Routes = [
           import('./features/donaciones/ranking.component/ranking.component').then(m => m.RankingComponent),
         title: 'Ranking de donantes — DonaVida'
       },
+      
     
     ]
   },
@@ -65,9 +66,17 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/usuarios/perfil.component/perfil.component').then(m => m.PerfilComponent),
         title: 'miPerfil'
-      }
+      },
+      
+
     ]
-  }
+  },
+  {
+  path: 'peticiones/realizar',
+  loadComponent: () =>
+    import('./features/peticiones/realizar-peticion.component/realizar-peticion.component')
+      .then(m => m.RealizarPeticionComponent)
+}
         
     ];
     

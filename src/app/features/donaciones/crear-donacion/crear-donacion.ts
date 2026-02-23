@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 type TipoDonacion = 'MONETARIA' | 'ESPECIES' | 'SERVICIOS';
 type Step = 1 | 2 | 3;
 
 interface DonacionForm {
-  usuarioId: number;
   tipo: TipoDonacion | '';
   monto: number | null;
   descripcion: string;
@@ -25,14 +27,24 @@ interface DonacionForm {
 })
 export class CrearDonacionComponent implements OnInit {
 
+  private router      = inject(Router);
+  private route       = inject(ActivatedRoute);
+  private http        = inject(HttpClient);
+  private authService = inject(AuthService);
+
   currentStep: Step = 1;
   totalSteps = 3;
   isLoading = false;
   isSuccess = false;
   errorMessage = '';
 
+  /**
+   * true cuando el tipo llegó pre-seleccionado desde una petición.
+   * Oculta el paso 1 y muestra un badge informativo en su lugar.
+   */
+  tipoPreseleccionado = false;
+
   form: DonacionForm = {
-    usuarioId: 1, // TODO: obtener del AuthService
     tipo: '',
     monto: null,
     descripcion: '',
@@ -76,9 +88,11 @@ export class CrearDonacionComponent implements OnInit {
     { monto: 250000, impacto: 'Uniformes para 10 niños' },
   ];
 
-  ngOnInit() {}
+  // ── Getters computados ────────────────────────────────────────────────────
 
-  constructor(private router: Router) {}
+  get tipoActualMeta() {
+    return this.tiposDonacion.find(t => t.value === this.form.tipo) ?? null;
+  }
 
   get impactoActual(): string {
     if (!this.form.monto) return '';
@@ -107,6 +121,31 @@ export class CrearDonacionComponent implements OnInit {
     return false;
   }
 
+  // ── Ciclo de vida ─────────────────────────────────────────────────────────
+
+  ngOnInit() {
+    // Verificar sesión activa — si no hay, redirect a login
+    const sesion = this.authService.usuario();
+    if (!sesion) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+      return;
+    }
+
+    // Leer queryParams: tipo, peticion, autor
+    this.route.queryParams.subscribe(params => {
+      const tipo = params['tipo'] as TipoDonacion | undefined;
+      if (tipo && ['MONETARIA', 'ESPECIES', 'SERVICIOS'].includes(tipo)) {
+        this.form.tipo = tipo;
+        this.tipoPreseleccionado = true;
+        this.currentStep = 2;
+      }
+    });
+  }
+
+  // ── Acciones del formulario ───────────────────────────────────────────────
+
   selectTipo(tipo: TipoDonacion) {
     this.form.tipo = tipo;
   }
@@ -132,8 +171,14 @@ export class CrearDonacionComponent implements OnInit {
 
   prevStep() {
     this.errorMessage = '';
-    if (this.currentStep > 1) this.currentStep = (this.currentStep - 1) as Step;
+    // Si el tipo vino preseleccionado no puede retroceder más allá del paso 2
+    const minStep: Step = this.tipoPreseleccionado ? 2 : 1;
+    if (this.currentStep > minStep) {
+      this.currentStep = (this.currentStep - 1) as Step;
+    }
   }
+
+  // ── Submit real al backend ────────────────────────────────────────────────
 
   onSubmit() {
     this.errorMessage = '';
@@ -142,23 +187,61 @@ export class CrearDonacionComponent implements OnInit {
       return;
     }
 
+    const sesion = this.authService.usuario();
+    if (!sesion) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.isLoading = true;
-    // TODO: conectar con POST /api/donaciones
-    const payload = {
-      usuarioId: this.form.usuarioId,
-      tipo: this.form.tipo,
-      monto: this.form.tipo === 'MONETARIA' ? this.form.monto : undefined,
-      descripcion: this.form.descripcion,
-      detalleEspecies: this.form.tipo === 'ESPECIES' ? this.form.detalleEspecies : undefined,
-      comprobante: this.form.comprobante || undefined
+
+    // Construir payload que espera DonacionRequestDTO.java
+    const payload: Record<string, unknown> = {
+      usuarioId:   sesion.userId,
+      tipo:        this.form.tipo,
+      descripcion: this.form.descripcion.trim()
     };
 
-    console.log('POST /api/donaciones', payload);
+    if (this.form.tipo === 'MONETARIA' && this.form.monto) {
+      payload['monto'] = this.form.monto;
+    }
+    if (this.form.tipo === 'ESPECIES' && this.form.detalleEspecies.trim()) {
+      payload['detalleEspecies'] = this.form.detalleEspecies.trim();
+    }
+    if (this.form.comprobante.trim()) {
+      payload['comprobante'] = this.form.comprobante.trim();
+    }
 
-    setTimeout(() => {
-      this.isLoading = false;
-      this.isSuccess = true;
-    }, 1800);
+    const token = this.authService.token();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type':  'application/json'
+    });
+
+    this.http
+      .post(`${environment.apiUrl}/donaciones`, payload, { headers })
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.isSuccess = true;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage =
+            err.error?.mensaje ??
+            err.error?.message ??
+            (err.status === 409
+              ? 'Ya tienes una donación pendiente. Espera a que sea confirmada.'
+              : err.status === 401
+                ? 'Tu sesión expiró. Por favor inicia sesión nuevamente.'
+                : 'Ocurrió un error al registrar la donación. Intenta más tarde.');
+
+          if (err.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          }
+        }
+      });
   }
 
   goToDonaciones() {

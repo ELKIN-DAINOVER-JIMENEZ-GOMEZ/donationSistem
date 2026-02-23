@@ -1,5 +1,4 @@
-
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -10,17 +9,37 @@ import { RouterModule } from '@angular/router';
   templateUrl: './navbar.components.html',
   styleUrls: ['./navbar.components.css']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   isScrolled = false;
   isMobileMenuOpen = false;
+  isLightMode = false;
 
-  @HostListener('window:scroll') //escucha el evento de scroll en la ventana
+  ngOnInit(): void {
+    const saved = localStorage.getItem('donavida_theme');
+    if (saved === 'light') {
+      this.isLightMode = true;
+      document.body.classList.add('light-mode'); // ← CORRECCIÓN: body, no html
+    }
+  }
+
+  @HostListener('window:scroll')
   onWindowScroll() {
     this.isScrolled = window.scrollY > 20;
   }
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  toggleTheme() {
+    this.isLightMode = !this.isLightMode;
+    if (this.isLightMode) {
+      document.body.classList.add('light-mode'); // ← CORRECCIÓN: body, no html
+      localStorage.setItem('donavida_theme', 'light');
+    } else {
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('donavida_theme', 'dark');
+    }
   }
 
   scrollToSection(sectionId: string) {

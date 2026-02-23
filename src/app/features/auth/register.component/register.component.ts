@@ -14,12 +14,12 @@ import { NotificacionService } from '../../../core/services/notificacion.service
 })
 export class registerComponent {
 
+  // Solo los campos que requiere UsuarioRegistroDTO.java del backend:
+  // nombre, apellido, email, password, rol
   registerData = {
     nombre: '',
     apellido: '',
     email: '',
-    telefono: '',
-    organizacion: '',
     rol: 'DONANTE' as 'DONANTE' | 'LIDER_SOCIAL',
     password: '',
     confirmPassword: '',
@@ -38,8 +38,8 @@ export class registerComponent {
   private router         = inject(Router);
 
   roles = [
-    { value: 'DONANTE',      label: 'Donante',      description: 'Quiero realizar donaciones y apoyar causas',    icon: 'heart'  },
-    { value: 'LIDER_SOCIAL', label: 'Líder Social',  description: 'Represento una comunidad o proyecto social',   icon: 'users'  },
+    { value: 'DONANTE',      label: 'Donante',      description: 'Quiero realizar donaciones y apoyar causas',  icon: 'heart' },
+    { value: 'LIDER_SOCIAL', label: 'Líder Social',  description: 'Represento una comunidad o proyecto social', icon: 'users' },
   ];
 
   benefits = [
@@ -83,10 +83,17 @@ export class registerComponent {
     else this.showConfirm = !this.showConfirm;
   }
 
+  // Paso 1: valida nombre, apellido y email antes de avanzar
   nextStep() {
     this.errorMessage = '';
-    if (!this.registerData.nombre || !this.registerData.apellido || !this.registerData.email) {
-      this.errorMessage = 'Por favor completa nombre, apellido y correo.';
+
+    if (!this.registerData.nombre.trim()) {
+      this.errorMessage = 'Por favor ingresa tu nombre.';
+      return;
+    }
+    
+    if (!this.registerData.email.trim()) {
+      this.errorMessage = 'Por favor ingresa tu correo electrónico.';
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,6 +101,7 @@ export class registerComponent {
       this.errorMessage = 'Ingresa un correo electrónico válido.';
       return;
     }
+
     this.currentStep = 2;
   }
 
@@ -120,6 +128,7 @@ export class registerComponent {
 
     this.isLoading = true;
 
+    // Construye el payload con exactamente los campos del UsuarioRegistroDTO
     const { confirmPassword, acceptTerms, ...payload } = this.registerData;
 
     this.authService.registrar(payload).subscribe({
