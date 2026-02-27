@@ -92,6 +92,10 @@
   <div class="loading-state" *ngIf="isLoading">
     <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
   </div>
+  <!-- ══ ERROR ════════════════════════════════════════════════ -->
+<div class="error-state" *ngIf="!isLoading && errorMessage">
+  <p>⚠️ {{ errorMessage }}</p>
+</div>
 
   <!-- ══ LISTA ═════════════════════════════════════════════════ -->
   <section class="md-list" *ngIf="!isLoading">

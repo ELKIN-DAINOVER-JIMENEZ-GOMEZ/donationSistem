@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../../../core/services/auth.service';
 
 export interface RankingDonante {
   posicion: number;
@@ -19,13 +22,27 @@ export interface RankingDonante {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './ranking.component.html',
-  styleUrls: ['./ranking.component.css']
+  styleUrls: ['./ranking.component.css'],
+  encapsulation: ViewEncapsulation.None  // ← permite que body.light-mode funcione
 })
 export class RankingComponent implements OnInit {
 
-  isLoading = true;
+  isLoading    = true;
+  errorMessage = '';
   ranking: RankingDonante[] = [];
   limite = 10;
+
+  private http        = inject(HttpClient);
+  private authService = inject(AuthService);
+  private cdr         = inject(ChangeDetectorRef);
+
+  private authHeaders(): HttpHeaders {
+    const token = this.authService.token();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'X-Skip-Loading': 'true'
+    });
+  }
 
   get top3(): RankingDonante[]  { return this.ranking.slice(0, 3); }
   get resto(): RankingDonante[] { return this.ranking.slice(3); }
@@ -33,6 +50,7 @@ export class RankingComponent implements OnInit {
   get totalRecaudado(): number {
     return this.ranking.reduce((s, d) => s + d.totalDonado, 0);
   }
+
   get totalDonaciones(): number {
     return this.ranking.reduce((s, d) => s + d.cantidadDonaciones, 0);
   }
@@ -75,26 +93,32 @@ export class RankingComponent implements OnInit {
   }
 
   loadData() {
-    this.isLoading = true;
-    // TODO: GET /api/donaciones/ranking/top?limite={{ limite }}
-    setTimeout(() => {
-      this.ranking = MOCK_RANKING.slice(0, this.limite);
-      this.isLoading = false;
-    }, 800);
+    this.isLoading    = true;
+    this.errorMessage = '';
+
+    this.http
+      .get<RankingDonante[]>(
+        `${environment.apiUrl}/donaciones/ranking/top`,
+        {
+          params:  { limite: String(this.limite) },
+          headers: this.authHeaders()
+        }
+      )
+      .subscribe({
+        next: (data) => {
+          this.ranking   = data;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.errorMessage = err.status === 401
+            ? 'No autorizado. Por favor inicia sesión.'
+            : err.error?.mensaje ?? `Error ${err.status}: No se pudo cargar el ranking.`;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   ngOnInit() { this.loadData(); }
 }
-
-const MOCK_RANKING: RankingDonante[] = [
-  { posicion: 1, usuarioId: 5,  nombre: 'María González',  email: 'maria@example.com',   totalDonado: 850000, cantidadDonaciones: 12, promedioDonacion: 70833, tendencia: 'up'   },
-  { posicion: 2, usuarioId: 8,  nombre: 'Carlos Rodríguez',email: 'carlos@example.com',  totalDonado: 620000, cantidadDonaciones: 8,  promedioDonacion: 77500, tendencia: 'up'   },
-  { posicion: 3, usuarioId: 3,  nombre: 'Ana Martínez',    email: 'ana@example.com',     totalDonado: 480000, cantidadDonaciones: 15, promedioDonacion: 32000, tendencia: 'down' },
-  { posicion: 4, usuarioId: 12, nombre: 'Luis Herrera',    email: 'luis@example.com',    totalDonado: 350000, cantidadDonaciones: 7,  promedioDonacion: 50000, tendencia: 'same' },
-  { posicion: 5, usuarioId: 7,  nombre: 'Sandra López',    email: 'sandra@example.com',  totalDonado: 280000, cantidadDonaciones: 10, promedioDonacion: 28000, tendencia: 'up'   },
-  { posicion: 6, usuarioId: 2,  nombre: 'Jorge Ramírez',   email: 'jorge@example.com',   totalDonado: 220000, cantidadDonaciones: 5,  promedioDonacion: 44000, tendencia: 'up'   },
-  { posicion: 7, usuarioId: 15, nombre: 'Paula Jiménez',   email: 'paula@example.com',   totalDonado: 190000, cantidadDonaciones: 6,  promedioDonacion: 31666, tendencia: 'down' },
-  { posicion: 8, usuarioId: 9,  nombre: 'Roberto Castro',  email: 'roberto@example.com', totalDonado: 155000, cantidadDonaciones: 4,  promedioDonacion: 38750, tendencia: 'same' },
-  { posicion: 9, usuarioId: 11, nombre: 'Claudia Torres',  email: 'claudia@example.com', totalDonado: 120000, cantidadDonaciones: 9,  promedioDonacion: 13333, tendencia: 'up'   },
-  { posicion: 10,usuarioId: 4,  nombre: 'Andrés Morales',  email: 'andres@example.com',  totalDonado: 90000,  cantidadDonaciones: 3,  promedioDonacion: 30000, tendencia: 'down' },
-];

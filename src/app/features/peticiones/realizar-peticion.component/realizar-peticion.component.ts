@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -23,12 +23,13 @@ const STORAGE_KEY = 'donavida_peticiones';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './realizar-peticion.component.html',
-  styleUrls: ['./realizar-peticion.component.css']
+  styleUrls: ['./realizar-peticion.component.css'],
+  encapsulation: ViewEncapsulation.None  // ← permite que body.light-mode funcione
 })
 export class RealizarPeticionComponent {
 
-  isLoading  = false;
-  isSuccess  = false;
+  isLoading    = false;
+  isSuccess    = false;
   errorMessage = '';
   imagenPreview: string | null = null;
 
@@ -40,9 +41,9 @@ export class RealizarPeticionComponent {
   };
 
   tiposDonacion = [
-    { value: 'MONETARIA'  as TipoDonacionPeticion, label: 'Monetaria',   desc: 'Solicitar apoyo económico en dinero',              icon: 'money',     color: '#10b981' },
-    { value: 'ESPECIES'   as TipoDonacionPeticion, label: 'En Especies', desc: 'Solicitar bienes, alimentos, ropa u objetos',      icon: 'box',       color: '#f59e0b' },
-    { value: 'SERVICIOS'  as TipoDonacionPeticion, label: 'Servicios',   desc: 'Solicitar voluntarios o ayuda profesional',        icon: 'handshake', color: '#3b82f6' }
+    { value: 'MONETARIA'  as TipoDonacionPeticion, label: 'Monetaria',   desc: 'Solicitar apoyo económico en dinero',         icon: 'money',     color: '#10b981' },
+    { value: 'ESPECIES'   as TipoDonacionPeticion, label: 'En Especies', desc: 'Solicitar bienes, alimentos, ropa u objetos', icon: 'box',       color: '#f59e0b' },
+    { value: 'SERVICIOS'  as TipoDonacionPeticion, label: 'Servicios',   desc: 'Solicitar voluntarios o ayuda profesional',   icon: 'handshake', color: '#3b82f6' }
   ];
 
   constructor(private router: Router) {}
@@ -59,70 +60,38 @@ export class RealizarPeticionComponent {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     const file = input.files[0];
-    if (!file.type.startsWith('image/')) {
-      this.errorMessage = 'Por favor selecciona un archivo de imagen válido.';
-      return;
-    }
+    if (!file.type.startsWith('image/')) { this.errorMessage = 'Por favor selecciona un archivo de imagen válido.'; return; }
     const reader = new FileReader();
-    reader.onload = () => {
-      this.imagenPreview = reader.result as string;
-      this.form.imagenUrl = reader.result as string;
-    };
+    reader.onload = () => { this.imagenPreview = reader.result as string; this.form.imagenUrl = reader.result as string; };
     reader.readAsDataURL(file);
   }
 
-  eliminarImagen(): void {
-    this.imagenPreview = null;
-    this.form.imagenUrl = null;
-  }
+  eliminarImagen(): void { this.imagenPreview = null; this.form.imagenUrl = null; }
 
   publicar(): void {
     this.errorMessage = '';
-    if (!this.isFormValid) {
-      this.errorMessage = 'Por favor completa todos los campos obligatorios.';
-      return;
-    }
-
+    if (!this.isFormValid) { this.errorMessage = 'Por favor completa todos los campos obligatorios.'; return; }
     this.isLoading = true;
-
-    // Leer sesión del usuario
-    let autorNombre = 'Líder Social';
-    let autorOrganizacion = 'Organización';
+    let autorNombre = 'Líder Social', autorOrganizacion = 'Organización';
     try {
       const sesion = JSON.parse(localStorage.getItem('usuario_sesion') || '{}');
       if (sesion.nombre)       autorNombre       = sesion.nombre;
       if (sesion.organizacion) autorOrganizacion = sesion.organizacion;
     } catch { }
-
     const nueva: Peticion = {
-      id:                Date.now(),
-      titulo:            this.form.titulo.trim(),
-      descripcion:       this.form.descripcion.trim(),
-      tipoDonacion:      this.form.tipoDonacion as TipoDonacionPeticion,
-      imagenUrl:         this.form.imagenUrl,
-      autorNombre,
-      autorOrganizacion,
-      fechaPublicacion:  new Date().toISOString()
+      id: Date.now(), titulo: this.form.titulo.trim(), descripcion: this.form.descripcion.trim(),
+      tipoDonacion: this.form.tipoDonacion as TipoDonacionPeticion,
+      imagenUrl: this.form.imagenUrl, autorNombre, autorOrganizacion,
+      fechaPublicacion: new Date().toISOString()
     };
-
-    // Guardar directo en localStorage
     try {
       const actuales: Peticion[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       actuales.unshift(nueva);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(actuales));
     } catch { }
-
-    setTimeout(() => {
-      this.isLoading = false;
-      this.isSuccess = true;
-    }, 1000);
+    setTimeout(() => { this.isLoading = false; this.isSuccess = true; }, 1000);
   }
 
-  irAlDashboard(): void {
-    this.router.navigate(['/dashboard']);
-  }
-
-  volver(): void {
-    this.router.navigate(['/perfil']);
-  }
+  irAlDashboard() { this.router.navigate(['/dashboard']); }
+  volver()        { this.router.navigate(['usuarios/perfil']); }
 }

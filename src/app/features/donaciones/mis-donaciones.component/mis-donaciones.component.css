@@ -1,13 +1,12 @@
 /* ══════════════════════════════════════════════════════
-   Variables — idénticas al login/register
+   Variables — dark mode (default)
 ══════════════════════════════════════════════════════ */
-:host {
+.md-root {
   --emerald:        #10b981;
   --emerald-light:  #34d399;
   --emerald-dark:   #059669;
   --teal:           #14b8a6;
   --bg-dark:        #050d14;
-  --bg-mid:         #0c1a27;
   --surface:        #0f2235;
   --surface-2:      #162d44;
   --border:         rgba(255,255,255,0.08);
@@ -21,7 +20,7 @@
   background: var(--bg-dark);
 }
 
-/* ══ Header — mismo degradado que login-left ═══════════ */
+/* ══ Header ════════════════════════════════════════════ */
 .md-header {
   position: relative;
   background: linear-gradient(155deg, #071a2e 0%, #0a2540 50%, #062518 100%);
@@ -30,7 +29,6 @@
   overflow: hidden;
 }
 
-/* Blobs decorativos — mismo estilo que el register */
 .md-header::before {
   content: '';
   position: absolute; top: -80px; right: -80px;
@@ -46,15 +44,6 @@
   filter: blur(60px); opacity: .2; pointer-events: none;
 }
 
-/* dot-grid — idéntico al register */
-.md-header-bg {
-  position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: radial-gradient(ellipse 80% 90% at 60% 50%, black 40%, transparent 100%);
-  pointer-events: none;
-}
-
 .md-header-inner {
   position: relative; z-index: 1;
   max-width: 860px; margin: 0 auto;
@@ -68,7 +57,7 @@
 }
 .md-header p { color: var(--text-muted); margin: 0; font-size: .875rem; }
 
-/* Botón nueva donación — idéntico al btn-submit del login */
+/* ══ Botón nueva donación ═══════════════════════════════ */
 .btn-new {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 12px 22px;
@@ -83,14 +72,13 @@
 .btn-new svg { width: 16px; height: 16px; transition: transform .2s; }
 .btn-new:hover svg { transform: translateX(4px); }
 
-/* ══ Stats bar — flotando sobre el header ══════════════ */
+/* ══ Stats bar ══════════════════════════════════════════ */
 .stats-bar {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 12px; max-width: 860px; margin: -24px auto 0;
   padding: 0 40px; position: relative; z-index: 2;
 }
 
-/* Stat card — mismo patrón que stat-item del login */
 .stat-card {
   display: flex; align-items: center; gap: 14px;
   padding: 18px 20px;
@@ -115,10 +103,10 @@
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .stat-icon-wrap svg { width: 20px; height: 20px; }
-.ico-green  { background: rgba(16,185,129,0.15); color: var(--emerald-light); }
-.ico-rose   { background: rgba(244,63,94,0.12);  color: #fb7185; }
-.ico-amber  { background: rgba(245,158,11,0.12); color: #fbbf24; }
-.ico-blue   { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.stat-icon-wrap.green  { background: rgba(16,185,129,0.15); color: var(--emerald-light); }
+.stat-icon-wrap.rose   { background: rgba(244,63,94,0.12);  color: #fb7185; }
+.stat-icon-wrap.amber  { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.stat-icon-wrap.blue   { background: rgba(59,130,246,0.12); color: #60a5fa; }
 
 .stat-lbl {
   font-size: .7rem; color: var(--text-muted); margin: 0 0 2px;
@@ -134,14 +122,13 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ══ Filters ═══════════════════════════════════════════ */
+/* ══ Filters ════════════════════════════════════════════ */
 .md-filters {
   max-width: 860px; margin: 28px auto 0;
   padding: 0 40px;
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
 
-/* Search — mismo patrón que field-inner del login */
 .search-wrap { position: relative; flex: 1; min-width: 200px; }
 .search-icon {
   position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
@@ -161,7 +148,6 @@
   background: var(--surface-2);
 }
 
-/* Filter buttons — mismo patrón que btn-social */
 .filter-group { display: flex; gap: 6px; }
 .filter-btn {
   padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 10px;
@@ -170,8 +156,8 @@
   cursor: pointer !important; transition: background .2s, border-color .2s, color .2s;
   white-space: nowrap;
 }
-.filter-btn:hover { background: var(--surface-2); border-color: rgba(255,255,255,0.14); color: var(--text-secondary); }
-.filter-btn.active { background: var(--surface-2); border-color: rgba(255,255,255,0.2); color: var(--text-primary); }
+.filter-btn:hover        { background: var(--surface-2); border-color: rgba(255,255,255,0.14); color: var(--text-secondary); }
+.filter-btn.active       { background: var(--surface-2); border-color: rgba(255,255,255,0.2);  color: var(--text-primary); }
 .filter-btn.state-pending   { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
 .filter-btn.state-confirmed { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.35); color: var(--emerald-light); }
 .filter-btn.state-rejected  { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.35);  color: #fca5a5; }
@@ -184,7 +170,7 @@
 }
 .filter-select:focus { border-color: var(--emerald); }
 
-/* ══ Skeleton loading ══════════════════════════════════ */
+/* ══ Skeleton loading ═══════════════════════════════════ */
 .loading-state {
   max-width: 860px; margin: 24px auto 0;
   padding: 0 40px; display: flex; flex-direction: column; gap: 8px;
@@ -196,13 +182,19 @@
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-/* ══ Lista de donaciones ═══════════════════════════════ */
+/* ══ Error state ════════════════════════════════════════ */
+.error-state {
+  max-width: 860px; margin: 24px auto 0; padding: 0 40px;
+  color: #fca5a5; font-size: .9rem;
+}
+
+/* ══ Lista ══════════════════════════════════════════════ */
 .md-list {
   max-width: 860px; margin: 20px auto 0;
   padding: 0 40px 60px; display: flex; flex-direction: column; gap: 8px;
 }
 
-/* ══ Empty state ═══════════════════════════════════════ */
+/* ══ Empty state ════════════════════════════════════════ */
 .empty-state { text-align: center; padding: 64px 24px; }
 .empty-icon {
   width: 72px; height: 72px; border-radius: 50%;
@@ -227,20 +219,19 @@
 }
 .btn-new-sm:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(16,185,129,0.4); }
 
-/* ══ Donation card ═════════════════════════════════════ */
+/* ══ Donation card ══════════════════════════════════════ */
 .don-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 14px; overflow: hidden;
   transition: background .25s, border-color .25s, box-shadow .25s;
   animation: slideUp .3s ease both;
 }
-.don-card:hover { background: var(--surface-2); border-color: rgba(255,255,255,0.12); }
+.don-card:hover    { background: var(--surface-2); border-color: rgba(255,255,255,0.12); }
 .don-card.expanded { border-color: var(--border-hover); box-shadow: 0 0 24px rgba(16,185,129,0.08); }
 
 .don-card-header {
   display: flex; align-items: center; gap: 16px;
-  padding: 18px 20px; cursor: pointer;
-  transition: background .15s;
+  padding: 18px 20px; cursor: pointer; transition: background .15s;
 }
 .don-card-header:hover { background: rgba(255,255,255,0.02); }
 
@@ -257,23 +248,25 @@
 .don-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
 .don-tipo-lbl { font-size: .72rem; color: var(--text-muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 
-/* Badges — idéntico al left-eyebrow del login */
 .don-badge {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px; border-radius: 100px;
-  font-size: .72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 100px; font-size: .72rem; font-weight: 700;
 }
-.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .65; animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100% { opacity: .65; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
-.badge-pendiente  { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.badge-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; opacity: .65;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity:.65; transform:scale(1); } 50% { opacity:1; transform:scale(1.3); } }
+.badge-pendiente  { background: rgba(245,158,11,0.12); color: #fbbf24;           border: 1px solid rgba(245,158,11,0.25); }
 .badge-confirmada { background: rgba(16,185,129,0.12); color: var(--emerald-light); border: 1px solid rgba(16,185,129,0.25); }
-.badge-rechazada  { background: rgba(239,68,68,0.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+.badge-rechazada  { background: rgba(239,68,68,0.1);   color: #fca5a5;           border: 1px solid rgba(239,68,68,0.25); }
 
 .don-desc {
   font-size: .9rem; font-weight: 700; color: var(--text-primary);
   margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.don-meta { display: flex; align-items: center; gap: 12px; font-size: .78rem; color: var(--text-muted); }
+.don-meta  { display: flex; align-items: center; gap: 12px; font-size: .78rem; color: var(--text-muted); }
 .don-monto { font-weight: 800; color: var(--emerald-light); font-size: .88rem; }
 
 .don-toggle {
@@ -282,20 +275,20 @@
   transition: color .15s, transform .25s;
 }
 .don-toggle.open { transform: rotate(180deg); color: var(--emerald-light); }
-.don-toggle svg { width: 18px; height: 18px; display: block; }
+.don-toggle svg  { width: 18px; height: 18px; display: block; }
 
-/* ══ Detail expand ═════════════════════════════════════ */
+/* ══ Detail expand ══════════════════════════════════════ */
 .don-detail {
   padding: 0 20px 20px; border-top: 1px solid var(--border);
   animation: slideInRight .25s ease;
 }
-@keyframes slideInRight { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInRight { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:translateX(0); } }
 .detail-grid { display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
 .detail-key {
   font-size: .7rem; color: var(--text-muted); margin: 0 0 3px;
   font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
 }
-.detail-val { font-size: .875rem; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+.detail-val  { font-size: .875rem; color: var(--text-secondary); margin: 0; line-height: 1.6; }
 .detail-link { font-size: .875rem; color: var(--emerald); font-weight: 600; text-decoration: none; transition: color .15s; }
 .detail-link:hover { color: var(--emerald-light); }
 .nota-text {
@@ -306,6 +299,7 @@
   background: rgba(239,68,68,0.06); border-left: 2px solid rgba(239,68,68,0.4); color: #fca5a5;
 }
 
+/* ══ Responsive ══════════════════════════════════════════ */
 @media (max-width: 640px) {
   .md-header, .md-filters, .md-list, .loading-state { padding-left: 20px; padding-right: 20px; }
   .stats-bar { grid-template-columns: 1fr 1fr; padding: 0 20px; }
@@ -313,3 +307,182 @@
   .md-header-inner { flex-direction: column; gap: 20px; }
   .md-header { padding: 32px 20px 48px; }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   LIGHT MODE
+   Funciona porque el componente usa ViewEncapsulation.None
+   Todos los selectores se aplican globalmente cuando body.light-mode
+══════════════════════════════════════════════════════════════════════ */
+
+body.light-mode .md-root {
+  --emerald:        var(--accent);
+  --emerald-light:  var(--text-accent);
+  --emerald-dark:   var(--accent-hover);
+  --teal:           var(--accent-alt);
+  --bg-dark:        var(--bg-primary);
+  --surface:        var(--bg-card);
+  --surface-2:      var(--bg-card-hover);
+  --border:         var(--border-color);
+  --border-hover:   var(--border-hover);
+  --text-primary:   var(--text-primary);
+  --text-secondary: var(--text-secondary);
+  --text-muted:     var(--text-muted);
+  background: var(--bg-primary);
+}
+
+/* ── Header ── */
+body.light-mode .md-header {
+  background: linear-gradient(155deg, #dbeafe 0%, #f0f9ff 50%, #d1fae5 100%) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+body.light-mode .md-header::before {
+  background: radial-gradient(circle, #0284c7 0%, transparent 70%) !important;
+  opacity: .08 !important;
+}
+body.light-mode .md-header::after {
+  background: radial-gradient(circle, #0ea5e9 0%, transparent 70%) !important;
+  opacity: .06 !important;
+}
+body.light-mode .md-header h1 { color: #0c1a2e !important; }
+body.light-mode .md-header p  { color: #4a6fa5 !important; }
+
+/* ── Botones ── */
+body.light-mode .btn-new,
+body.light-mode .btn-new-sm {
+  background: linear-gradient(135deg, var(--accent-gradient-from), var(--accent-gradient-to));
+  box-shadow: 0 8px 28px var(--shadow-accent);
+}
+
+/* ── Stats bar ── */
+body.light-mode .stat-card {
+  background: #ffffff;
+  border-color: rgba(2,132,199,0.15);
+  box-shadow: 0 2px 12px rgba(2,132,199,0.08);
+}
+body.light-mode .stat-card:hover {
+  background: #f0f9ff;
+  border-color: rgba(2,132,199,0.3);
+}
+body.light-mode .stat-main {
+  background: linear-gradient(135deg, rgba(2,132,199,0.08), rgba(14,165,233,0.05));
+  border-color: rgba(2,132,199,0.2);
+}
+body.light-mode .stat-main .stat-lbl { color: rgba(2,132,199,0.7); }
+body.light-mode .stat-main .stat-val { color: #0284c7; }
+body.light-mode .stat-val            { color: #0c1a2e; }
+body.light-mode .stat-lbl            { color: #4a6fa5; }
+
+body.light-mode .stat-icon-wrap.green { background: rgba(2,132,199,0.12);  color: #0284c7; }
+body.light-mode .stat-icon-wrap.rose  { background: rgba(244,63,94,0.10);  color: #e11d48; }
+body.light-mode .stat-icon-wrap.amber { background: rgba(245,158,11,0.10); color: #d97706; }
+body.light-mode .stat-icon-wrap.blue  { background: rgba(59,130,246,0.10); color: #2563eb; }
+
+/* ── Buscador ── */
+body.light-mode .search-input {
+  background: #ffffff;
+  border-color: rgba(2,132,199,0.2);
+  color: #0c1a2e;
+}
+body.light-mode .search-input::placeholder { color: #4a6fa5; }
+body.light-mode .search-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2,132,199,0.12);
+  background: #f0f9ff;
+}
+body.light-mode .search-icon { color: #4a6fa5; }
+
+/* ── Filtros ── */
+body.light-mode .filter-btn {
+  background: #ffffff;
+  border-color: rgba(2,132,199,0.15);
+  color: #4a6fa5;
+}
+body.light-mode .filter-btn:hover {
+  background: #f0f9ff;
+  border-color: rgba(2,132,199,0.3);
+  color: #1e3a5f;
+}
+body.light-mode .filter-btn.active {
+  background: #e0f2fe;
+  border-color: rgba(2,132,199,0.4);
+  color: #0c1a2e;
+}
+body.light-mode .filter-btn.state-pending   { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.35); color: #d97706; }
+body.light-mode .filter-btn.state-confirmed { background: rgba(2,132,199,0.08);  border-color: rgba(2,132,199,0.35);  color: #0284c7; }
+body.light-mode .filter-btn.state-rejected  { background: rgba(239,68,68,0.07);  border-color: rgba(239,68,68,0.3);   color: #dc2626; }
+
+body.light-mode .filter-select {
+  background: #ffffff;
+  border-color: rgba(2,132,199,0.2);
+  color: #1e3a5f;
+}
+
+/* ── Skeleton ── */
+body.light-mode .skeleton-card {
+  background: linear-gradient(90deg, #e0f2fe 25%, #bae6fd 50%, #e0f2fe 75%);
+  background-size: 200% 100%;
+}
+
+/* ── Tarjetas de donación ── */
+body.light-mode .don-card {
+  background: #ffffff;
+  border-color: rgba(2,132,199,0.15);
+}
+body.light-mode .don-card:hover {
+  background: #f0f9ff;
+  border-color: rgba(2,132,199,0.25);
+}
+body.light-mode .don-card.expanded {
+  border-color: rgba(2,132,199,0.5);
+  box-shadow: 0 0 20px rgba(2,132,199,0.1);
+}
+body.light-mode .don-card-header:hover { background: rgba(2,132,199,0.03); }
+
+body.light-mode .tipo-monetaria { background: rgba(2,132,199,0.12);  color: #0284c7; }
+body.light-mode .tipo-especies  { background: rgba(245,158,11,0.12); color: #d97706; }
+body.light-mode .tipo-servicios { background: rgba(59,130,246,0.12); color: #2563eb; }
+
+body.light-mode .don-tipo-lbl    { color: #4a6fa5; }
+body.light-mode .don-desc        { color: #0c1a2e; }
+body.light-mode .don-meta        { color: #4a6fa5; }
+body.light-mode .don-monto       { color: #0284c7; }
+body.light-mode .don-toggle      { color: #4a6fa5; }
+body.light-mode .don-toggle.open { color: #0284c7; }
+
+body.light-mode .badge-confirmada {
+  background: rgba(2,132,199,0.1); color: #0284c7; border-color: rgba(2,132,199,0.25);
+}
+body.light-mode .badge-pendiente {
+  background: rgba(245,158,11,0.1); color: #d97706; border-color: rgba(245,158,11,0.25);
+}
+body.light-mode .badge-rechazada {
+  background: rgba(239,68,68,0.08); color: #dc2626; border-color: rgba(239,68,68,0.2);
+}
+
+/* ── Detalle expandido ── */
+body.light-mode .don-detail    { border-top-color: rgba(2,132,199,0.12); }
+body.light-mode .detail-key    { color: #4a6fa5; }
+body.light-mode .detail-val    { color: #1e3a5f; }
+body.light-mode .detail-link   { color: #0284c7; }
+body.light-mode .detail-link:hover { color: #0369a1; }
+body.light-mode .nota-text {
+  background: #e0f2fe;
+  border-left-color: rgba(2,132,199,0.4);
+  color: #1e3a5f;
+}
+body.light-mode .nota-rechazo {
+  background: rgba(239,68,68,0.05);
+  border-left-color: rgba(239,68,68,0.35);
+  color: #dc2626;
+}
+
+/* ── Empty state ── */
+body.light-mode .empty-icon {
+  background: rgba(2,132,199,0.08);
+  border-color: rgba(2,132,199,0.2);
+  box-shadow: 0 0 32px rgba(2,132,199,0.1);
+}
+body.light-mode .empty-icon svg { color: #0284c7; }
+body.light-mode .empty-state h3 { color: #0c1a2e; }
+body.light-mode .empty-state p  { color: #4a6fa5; }

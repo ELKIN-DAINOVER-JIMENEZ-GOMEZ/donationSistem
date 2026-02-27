@@ -19,7 +19,20 @@ export interface UsuarioPerfil {
   posicionRanking?: number;
 }
 
-type Tab = 'perfil' | 'seguridad' | 'actividad';
+export interface DonacionPendiente {
+  id: number;
+  usuarioId: number;
+  nombreUsuario: string;
+  emailUsuario: string;
+  tipo: string;
+  monto?: number;
+  descripcion: string;
+  detalleEspecies?: string;
+  estado: string;
+  fechaDonacion: string;
+}
+
+type Tab = 'perfil' | 'seguridad' | 'actividad' | 'peticiones';
 
 @Component({
   selector: 'app-perfil',
@@ -43,6 +56,13 @@ export class PerfilComponent implements OnInit {
   showPass = { actual: false, nueva: false, confirmar: false };
   isSavingPass = signal(false);
 
+  // ── Peticiones pendientes ──────────────────────────────────────────────
+  donacionesPendientes: DonacionPendiente[] = [];
+  isLoadingPendientes = signal(false);
+  procesandoId = signal<number | null>(null);
+  motivoRechazo: { [id: number]: string } = {};
+  mostrarRechazo: { [id: number]: boolean } = {};
+
   private http        = inject(HttpClient);
   private router      = inject(Router);
   private authService = inject(AuthService);
@@ -56,13 +76,13 @@ export class PerfilComponent implements OnInit {
   }
 
   // ── Getters ────────────────────────────────────────────────────────────
-  get initials(): string {// Devuelve las iniciales del nombre del usuario o '?' si no hay usuario
+  get initials(): string {
     if (!this.usuario) return '?';
     const parts = this.usuario.nombre.trim().split(' ');
     return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '?';
   }
 
-  get rolLabel(): string {// Devuelve una etiqueta legible para el rol del usuario, con emojis
+  get rolLabel(): string {
     const map: Record<string, string> = {
       ADMINISTRADOR: '🛡️ Administrador',
       LIDER_SOCIAL:  '🌟 Líder Social',
@@ -71,7 +91,7 @@ export class PerfilComponent implements OnInit {
     return map[this.usuario?.rol] ?? this.usuario?.rol;
   }
 
-  get rolBadgeClass(): string {// Devuelve una clase CSS para el badge del rol del usuario
+  get rolBadgeClass(): string {
     const map: Record<string, string> = {
       ADMINISTRADOR: 'badge-admin',
       LIDER_SOCIAL:  'badge-lider',
@@ -80,7 +100,7 @@ export class PerfilComponent implements OnInit {
     return map[this.usuario?.rol] ?? '';
   }
 
-  get passwordStrength(): { score: number; label: string; cls: string } {// Evalúa la fortaleza de la contraseña nueva y devuelve un objeto con el puntaje, etiqueta y clase CSS correspondiente
+  get passwordStrength(): { score: number; label: string; cls: string } {
     const p = this.passForm.nueva;
     if (!p) return { score: 0, label: '', cls: '' };
     let score = 0;
@@ -105,6 +125,10 @@ export class PerfilComponent implements OnInit {
       && this.passForm.confirmar.length > 0;
   }
 
+  get esLiderSocial(): boolean {
+    return this.usuario?.rol === 'LIDER_SOCIAL';
+  }
+
   formatMonto(n: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency', currency: 'COP', minimumFractionDigits: 0,
@@ -117,56 +141,134 @@ export class PerfilComponent implements OnInit {
     });
   }
 
+  formatFechaCorta(f: string): string {
+    return new Date(f).toLocaleDateString('es-CO', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  }
+
   setTab(tab: Tab) {
     this.activeTab      = tab;
     this.successMessage.set('');
     this.errorMessage.set('');
+    if (tab === 'peticiones') {
+      this.cargarPendientes();
+    }
   }
 
-  // ── Cargar datos del perfil del usuario ────────────────────────────────
+  // ── Cargar datos del perfil ────────────────────────────────────────────
   ngOnInit() {
     const token  = this.authService.token();
     const sesion = this.authService.usuario();
 
-    // Validar que hay sesión activa
     if (!token || !sesion) {
-      this.router.navigate(['/login'], {
-        queryParams: { returnUrl: '/usuarios/perfil' }
-      });
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/usuarios/perfil' } });
       return;
     }
 
-    console.log('✓ Token disponible:', token.substring(0, 20) + '...');
-    console.log('✓ Usuario en sesión:', sesion.userId);
-
-    // Usar HttpClient con headers propios
-    // X-Skip-Loading evita que el loading interceptor muestre spinner global
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'X-Skip-Loading': 'true'  // ← Desactiva spinner global
+      'X-Skip-Loading': 'true'
     });
 
     this.http
       .get<UsuarioPerfil>(`${environment.apiUrl}/usuarios/${sesion.userId}`, { headers })
       .subscribe({
         next: (data) => {
-          console.log('✓ Datos del perfil cargados:', data);
           this.usuario   = data;
           this.form      = { ...data };
           this.isLoading.set(false);
-          console.log('✓ isLoading signal ahora es:', this.isLoading());
         },
         error: (err) => {
-          console.error('✗ Error cargando perfil:', err);
-          if (err.status === 401) {
-            this.authService.logout();
-            return;
-          }
-          this.errorMessage.set(err.error?.message 
-            || 'No se pudo cargar el perfil. Intenta nuevamente.');
+          if (err.status === 401) { this.authService.logout(); return; }
+          this.errorMessage.set(err.error?.message || 'No se pudo cargar el perfil.');
           this.isLoading.set(false);
-          console.log('✗ isLoading signal ahora es (error):', this.isLoading());
+        }
+      });
+  }
+
+  // ── Cargar donaciones pendientes ───────────────────────────────────────
+  cargarPendientes() {
+  this.isLoadingPendientes.set(true);
+  console.log('📋 Cargando pendientes...');
+
+  this.http
+    .get<DonacionPendiente[]>(
+      `${environment.apiUrl}/donaciones/estado/PENDIENTE`,
+      { headers: this.authHeaders() }
+    )
+    .subscribe({
+      next: (data) => {
+        console.log('✅ Pendientes recibidas:', data.length, data);
+        this.donacionesPendientes = data;
+        this.isLoadingPendientes.set(false);
+      },
+      error: (err) => {
+        console.error('❌ Error status:', err.status, err);
+        this.errorMessage.set(err.error?.mensaje ?? `Error ${err.status} cargando pendientes.`);
+        this.isLoadingPendientes.set(false);
+      }
+    });
+}
+
+  // ── Confirmar donación ─────────────────────────────────────────────────
+  confirmarDonacion(id: number) {
+    this.procesandoId.set(id);
+    this.http
+      .patch<void>(
+        `${environment.apiUrl}/donaciones/${id}/confirmar`,
+        null,
+        { headers: this.authHeaders() }
+      )
+      .subscribe({
+        next: () => {
+          this.donacionesPendientes = this.donacionesPendientes.filter(d => d.id !== id);
+          this.procesandoId.set(null);
+          this.successMessage.set('Donación confirmada correctamente.');
+          setTimeout(() => this.successMessage.set(''), 3500);
+        },
+        error: (err) => {
+          this.procesandoId.set(null);
+          this.errorMessage.set(err.error?.mensaje ?? 'Error al confirmar la donación.');
+        }
+      });
+  }
+
+  // ── Rechazar donación ──────────────────────────────────────────────────
+  toggleRechazo(id: number) {
+    this.mostrarRechazo[id] = !this.mostrarRechazo[id];
+    if (!this.motivoRechazo[id]) this.motivoRechazo[id] = '';
+  }
+
+  rechazarDonacion(id: number) {
+    const motivo = this.motivoRechazo[id]?.trim();
+    if (!motivo) {
+      this.errorMessage.set('Debes ingresar un motivo de rechazo.');
+      return;
+    }
+    this.procesandoId.set(id);
+    this.http
+      .patch<void>(
+        `${environment.apiUrl}/donaciones/${id}/rechazar`,
+        null,
+        {
+          headers: this.authHeaders(),
+          params: { motivo }
+        }
+      )
+      .subscribe({
+        next: () => {
+          this.donacionesPendientes = this.donacionesPendientes.filter(d => d.id !== id);
+          delete this.mostrarRechazo[id];
+          delete this.motivoRechazo[id];
+          this.procesandoId.set(null);
+          this.successMessage.set('Donación rechazada.');
+          setTimeout(() => this.successMessage.set(''), 3500);
+        },
+        error: (err) => {
+          this.procesandoId.set(null);
+          this.errorMessage.set(err.error?.mensaje ?? 'Error al rechazar la donación.');
         }
       });
   }
@@ -179,7 +281,6 @@ export class PerfilComponent implements OnInit {
       return;
     }
     this.isSaving.set(true);
-
     this.http
       .put<UsuarioPerfil>(
         `${environment.apiUrl}/usuarios/${this.usuario.id}`,
@@ -209,7 +310,6 @@ export class PerfilComponent implements OnInit {
     if (!this.passwordsMatch)           { this.errorMessage.set('Las contraseñas no coinciden.'); return; }
 
     this.isSavingPass.set(true);
-
     this.http
       .patch(
         `${environment.apiUrl}/auth/cambiar-password`,

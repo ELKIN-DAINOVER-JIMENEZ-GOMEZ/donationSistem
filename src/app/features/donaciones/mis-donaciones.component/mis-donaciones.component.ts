@@ -1,10 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
+
 
 export interface Donacion {
   id: number;
+  usuarioId: number;
+  nombreUsuario: string;
+  emailUsuario: string;
   tipo: 'MONETARIA' | 'ESPECIES' | 'SERVICIOS';
   estado: 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
   monto?: number;
@@ -24,18 +31,32 @@ type FiltroTipo   = 'TODOS' | 'MONETARIA' | 'ESPECIES' | 'SERVICIOS';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './mis-donaciones.component.html',
-  styleUrls: ['./mis-donaciones.component.css']
+  styleUrls: ['./mis-donaciones.component.css'],
+  encapsulation: ViewEncapsulation.None   // ← CLAVE: permite que body.light-mode funcione
 })
 export class MisDonacionesComponent implements OnInit {
 
   isLoading = true;
+  errorMessage = '';
   donaciones: Donacion[] = [];
   filtroEstado: FiltroEstado = 'TODOS';
   filtroTipo: FiltroTipo = 'TODOS';
   busqueda = '';
   expandedId: number | null = null;
 
-  // Stats
+  private http        = inject(HttpClient);
+  private authService = inject(AuthService);
+  private cdr         = inject(ChangeDetectorRef);
+
+  private authHeaders(): HttpHeaders {
+    const token = this.authService.token();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'X-Skip-Loading': 'true'
+    });
+  }
+
+  // ── Stats ──────────────────────────────────────────────────────────────
   get totalDonado(): number {
     return this.donaciones
       .filter(d => d.estado === 'CONFIRMADA' && d.tipo === 'MONETARIA')
@@ -46,9 +67,9 @@ export class MisDonacionesComponent implements OnInit {
 
   get donacionesFiltradas(): Donacion[] {
     return this.donaciones.filter(d => {
-      const matchEstado  = this.filtroEstado === 'TODOS' || d.estado === this.filtroEstado;
-      const matchTipo    = this.filtroTipo   === 'TODOS' || d.tipo   === this.filtroTipo;
-      const matchBusqueda = !this.busqueda   ||
+      const matchEstado   = this.filtroEstado === 'TODOS' || d.estado === this.filtroEstado;
+      const matchTipo     = this.filtroTipo   === 'TODOS' || d.tipo   === this.filtroTipo;
+      const matchBusqueda = !this.busqueda    ||
         d.descripcion.toLowerCase().includes(this.busqueda.toLowerCase()) ||
         (d.detalleEspecies || '').toLowerCase().includes(this.busqueda.toLowerCase());
       return matchEstado && matchTipo && matchBusqueda;
@@ -71,59 +92,26 @@ export class MisDonacionesComponent implements OnInit {
     });
   }
 
+  // ── Cargar mis donaciones desde el API ─────────────────────────────────
   ngOnInit() {
-    // TODO: GET /api/donaciones/usuario/{usuarioId}
-    setTimeout(() => {
-      this.donaciones = MOCK_DONACIONES;
-      this.isLoading = false;
-    }, 900);
+    this.http
+      .get<Donacion[]>(
+        `${environment.apiUrl}/donaciones/mis-donaciones`,
+        { headers: this.authHeaders() }
+      )
+      .subscribe({
+        next: (data) => {
+          this.donaciones = data;
+          this.isLoading  = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.errorMessage = err.status === 401
+            ? 'No autorizado. Por favor inicia sesión.'
+            : err.error?.mensaje ?? 'No se pudieron cargar tus donaciones.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 }
-
-const MOCK_DONACIONES: Donacion[] = [
-  {
-    id: 1,
-    tipo: 'MONETARIA',
-    estado: 'CONFIRMADA',
-    monto: 50000,
-    descripcion: 'Apoyo para kit de útiles escolares',
-    comprobante: 'https://drive.google.com/comprobante1',
-    fechaDonacion: '2026-02-10T09:30:00',
-    fechaConfirmacion: '2026-02-11T14:00:00',
-    notas: 'Donación verificada correctamente. ¡Gracias por tu apoyo!'
-  },
-  {
-    id: 2,
-    tipo: 'MONETARIA',
-    estado: 'PENDIENTE',
-    monto: 120000,
-    descripcion: 'Ayuda para mercado básico familiar',
-    fechaDonacion: '2026-02-18T16:45:00'
-  },
-  {
-    id: 3,
-    tipo: 'ESPECIES',
-    estado: 'CONFIRMADA',
-    descripcion: 'Ropa para temporada escolar',
-    detalleEspecies: '25 uniformes escolares talla 30-34, 10 pares de zapatos colegiales',
-    fechaDonacion: '2026-01-28T11:20:00',
-    fechaConfirmacion: '2026-01-30T09:00:00'
-  },
-  {
-    id: 4,
-    tipo: 'SERVICIOS',
-    estado: 'PENDIENTE',
-    descripcion: 'Clases de matemáticas para niños de primaria',
-    fechaDonacion: '2026-02-15T08:00:00'
-  },
-  {
-    id: 5,
-    tipo: 'MONETARIA',
-    estado: 'RECHAZADA',
-    monto: 30000,
-    descripcion: 'Apoyo para medicamentos',
-    comprobante: 'https://drive.google.com/comprobante5',
-    fechaDonacion: '2026-02-01T10:00:00',
-    notas: 'Comprobante no coincide con el monto indicado. Por favor vuelve a intentarlo con el comprobante correcto.'
-  }
-];

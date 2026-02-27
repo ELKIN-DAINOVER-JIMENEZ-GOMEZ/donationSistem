@@ -59,7 +59,7 @@
     <!-- ── Tabs ─────────────────────────────────────────────── -->
     <div class="pf-tabs-wrap">
       <div class="pf-tabs">
-        <button class="tab-btn" [class.active]="activeTab === 'perfil'"    (click)="setTab('perfil')"    type="button">
+        <button class="tab-btn" [class.active]="activeTab === 'perfil'" (click)="setTab('perfil')" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
@@ -76,6 +76,19 @@
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
           Actividad
+        </button>
+
+        <!-- Pestaña exclusiva para Líder Social -->
+        <button class="tab-btn tab-btn-lider" *ngIf="esLiderSocial"
+                [class.active]="activeTab === 'peticiones'"
+                (click)="setTab('peticiones')" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/>
+          </svg>
+          Confirmar Peticiones
+          <span class="tab-badge" *ngIf="donacionesPendientes.length > 0">
+            {{ donacionesPendientes.length }}
+          </span>
         </button>
       </div>
     </div>
@@ -98,7 +111,6 @@
       <div class="pf-panel" *ngIf="activeTab === 'perfil'">
         <div class="panel-title">Información personal</div>
 
-        <!-- Nombre completo (campo único del backend) -->
         <div class="form-field">
           <label>Nombre completo <span class="req">*</span></label>
           <div class="f-inner" [class.has-value]="form.nombre">
@@ -111,7 +123,6 @@
           </div>
         </div>
 
-        <!-- Correo -->
         <div class="form-field">
           <label>Correo electrónico <span class="req">*</span></label>
           <div class="f-inner" [class.has-value]="form.email">
@@ -124,7 +135,6 @@
           </div>
         </div>
 
-        <!-- Rol (solo lectura) -->
         <div class="form-field">
           <label>Rol</label>
           <div class="rol-display">
@@ -157,7 +167,6 @@
           <p>Usa una contraseña única de al menos 8 caracteres con letras, números y símbolos.</p>
         </div>
 
-        <!-- Contraseña actual -->
         <div class="form-field">
           <label>Contraseña actual <span class="req">*</span></label>
           <div class="f-inner">
@@ -176,7 +185,6 @@
           </div>
         </div>
 
-        <!-- Nueva contraseña -->
         <div class="form-field">
           <label>Nueva contraseña <span class="req">*</span></label>
           <div class="f-inner">
@@ -193,7 +201,6 @@
               <svg *ngIf="showPass.nueva"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
-          <!-- Fortaleza -->
           <div class="strength-wrap" *ngIf="passForm.nueva">
             <div class="strength-bars">
               <div class="sbar" [class]="passwordStrength.score >= 1 ? passwordStrength.cls : ''"></div>
@@ -206,7 +213,6 @@
           </div>
         </div>
 
-        <!-- Confirmar contraseña -->
         <div class="form-field">
           <label>Confirmar contraseña <span class="req">*</span></label>
           <div class="f-inner" [class.match]="passwordsMatch" [class.nomatch]="passForm.confirmar && !passwordsMatch">
@@ -277,25 +283,22 @@
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
             </svg>
           </a>
-            
-           <a routerLink="/peticiones/realizar" class="act-card"
-   *ngIf="usuario.rol === 'LIDER_SOCIAL'">
-  <div class="act-icon ico-green">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-      <line x1="22" y1="2" x2="11" y2="13"/>
-      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-    </svg>
-  </div>
-  <div class="act-info">
-    <p class="act-title">Realizar Petición</p>
-    <p class="act-desc">Publica una solicitud de donación para tu comunidad</p>
-  </div>
-  <svg class="act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
-  </svg>
-</a>
+
+          <a routerLink="/peticiones/realizar" class="act-card" *ngIf="usuario.rol === 'LIDER_SOCIAL'">
+            <div class="act-icon ico-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </div>
+            <div class="act-info">
+              <p class="act-title">Realizar Petición</p>
+              <p class="act-desc">Publica una solicitud de donación para tu comunidad</p>
+            </div>
+            <svg class="act-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
+            </svg>
+          </a>
 
           <a routerLink="/donaciones/crear" class="act-card act-cta">
             <div class="act-icon ico-emerald">
@@ -311,10 +314,90 @@
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
             </svg>
           </a>
+        </div>
+      </div>
 
-         
+      <!-- ── TAB: Confirmar Peticiones (solo LIDER_SOCIAL) ──── -->
+      <div class="pf-panel" *ngIf="activeTab === 'peticiones' && esLiderSocial">
+        <div class="panel-title">Donaciones pendientes de confirmación</div>
+
+        <!-- Loading skeleton -->
+        <div *ngIf="isLoadingPendientes()" class="pet-loading">
+          <div class="skel-row" *ngFor="let i of [1,2,3]"></div>
         </div>
 
+        <!-- Sin pendientes -->
+        <div *ngIf="!isLoadingPendientes() && donacionesPendientes.length === 0" class="pet-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/>
+          </svg>
+          <p>No hay donaciones pendientes de revisión.</p>
+        </div>
+
+        <!-- Lista de pendientes -->
+        <div class="pet-list" *ngIf="!isLoadingPendientes() && donacionesPendientes.length > 0">
+          <div class="pet-card" *ngFor="let d of donacionesPendientes">
+
+            <div class="pet-header">
+              <div class="pet-avatar">{{ d.nombreUsuario[0].toUpperCase() }}</div>
+              <div class="pet-user-info">
+                <p class="pet-nombre">{{ d.nombreUsuario }}</p>
+                <p class="pet-email">{{ d.emailUsuario }}</p>
+              </div>
+              <div class="pet-meta">
+                <span class="pet-tipo" [class.tipo-mon]="d.tipo === 'MONETARIA'" [class.tipo-esp]="d.tipo === 'ESPECIES'">
+                  {{ d.tipo === 'MONETARIA' ? '💵 Monetaria' : '📦 Especies' }}
+                </span>
+                <span class="pet-fecha">{{ formatFechaCorta(d.fechaDonacion) }}</span>
+              </div>
+            </div>
+
+            <div class="pet-body">
+              <div class="pet-monto" *ngIf="d.monto">
+                <span class="pet-monto-val">{{ formatMonto(d.monto) }}</span>
+              </div>
+              <p class="pet-desc">{{ d.descripcion }}</p>
+              <p class="pet-especies" *ngIf="d.detalleEspecies">
+                <strong>Detalle:</strong> {{ d.detalleEspecies }}
+              </p>
+            </div>
+
+            <!-- Acciones -->
+            <div class="pet-actions">
+              <button class="btn-confirmar"
+                      (click)="confirmarDonacion(d.id)"
+                      [disabled]="procesandoId() === d.id"
+                      type="button">
+                <svg *ngIf="procesandoId() === d.id" class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10" stroke-linecap="round"/></svg>
+                <svg *ngIf="procesandoId() !== d.id" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                {{ procesandoId() === d.id ? 'Procesando...' : 'Confirmar' }}
+              </button>
+
+              <button class="btn-rechazar-toggle"
+                      (click)="toggleRechazo(d.id)"
+                      [disabled]="procesandoId() === d.id"
+                      type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Rechazar
+              </button>
+            </div>
+
+            <!-- Panel de rechazo -->
+            <div class="pet-rechazo" *ngIf="mostrarRechazo[d.id]">
+              <input type="text"
+                     [(ngModel)]="motivoRechazo[d.id]"
+                     placeholder="Motivo del rechazo (obligatorio)"
+                     class="rechazo-input"/>
+              <button class="btn-rechazar-confirm"
+                      (click)="rechazarDonacion(d.id)"
+                      [disabled]="procesandoId() === d.id"
+                      type="button">
+                Confirmar rechazo
+              </button>
+            </div>
+
+          </div>
+        </div>
       </div>
 
     </div>

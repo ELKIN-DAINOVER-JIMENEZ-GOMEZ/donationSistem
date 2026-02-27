@@ -39,18 +39,31 @@
       <div class="skel-bar" style="height:100px;animation-delay:0.2s"></div>
     </div>
     <div class="list-skeleton">
-      <div class="skel-row" *ngFor="let i of [1,2,3,4,5,6,7]"
+      <div class="skel-row" *ngFor="let i of [1,2,3,4,5]"
            [style.animation-delay]="i * 0.05 + 's'"></div>
     </div>
   </div>
 
-  <ng-container *ngIf="!isLoading && ranking.length > 0">
+  <!-- ══ ERROR ═════════════════════════════════════════════════ -->
+  <div class="rk-error" *ngIf="!isLoading && errorMessage">
+    <p>⚠️ {{ errorMessage }}</p>
+  </div>
 
-    <!-- ══ PODIO TOP 3 ═════════════════════════════════════════ -->
+  <!-- ══ SIN DATOS ═════════════════════════════════════════════ -->
+  <div class="rk-empty" *ngIf="!isLoading && !errorMessage && ranking.length === 0">
+    <div class="rk-empty-icon">🏆</div>
+    <p class="rk-empty-title">Aún no hay donantes en el ranking</p>
+    <p class="rk-empty-sub">Las donaciones confirmadas aparecerán aquí</p>
+  </div>
+
+  <!-- ══ CONTENIDO ════════════════════════════════════════════ -->
+  <ng-container *ngIf="!isLoading && !errorMessage && ranking.length > 0">
+
+    <!-- ══ PODIO (solo los que haya: 1, 2 o 3+) ══════════════ -->
     <section class="podio-section">
-      <div class="podio">
+      <div class="podio" [class.podio-1only]="top3.length === 1" [class.podio-2only]="top3.length === 2">
 
-        <!-- 2do lugar (izquierda) -->
+        <!-- 2do lugar — solo si existe -->
         <div class="podio-slot podio-2" *ngIf="top3[1]">
           <div class="podio-avatar-wrap">
             <div class="podio-avatar av-silver">{{ getInitials(top3[1].nombre) }}</div>
@@ -60,12 +73,10 @@
             <p class="podio-name">{{ top3[1].nombre.split(' ')[0] }}</p>
             <p class="podio-amount">{{ formatMonto(top3[1].totalDonado) }}</p>
           </div>
-          <div class="podio-block silver">
-            <span>2°</span>
-          </div>
+          <div class="podio-block silver"><span>2°</span></div>
         </div>
 
-        <!-- 1er lugar (centro) -->
+        <!-- 1er lugar — siempre existe si hay datos -->
         <div class="podio-slot podio-1" *ngIf="top3[0]">
           <div class="podio-crown">👑</div>
           <div class="podio-avatar-wrap">
@@ -76,12 +87,10 @@
             <p class="podio-name">{{ top3[0].nombre.split(' ')[0] }}</p>
             <p class="podio-amount gold-amt">{{ formatMonto(top3[0].totalDonado) }}</p>
           </div>
-          <div class="podio-block gold">
-            <span>1°</span>
-          </div>
+          <div class="podio-block gold"><span>1°</span></div>
         </div>
 
-        <!-- 3er lugar (derecha) -->
+        <!-- 3er lugar — solo si existe -->
         <div class="podio-slot podio-3" *ngIf="top3[2]">
           <div class="podio-avatar-wrap">
             <div class="podio-avatar av-bronze">{{ getInitials(top3[2].nombre) }}</div>
@@ -91,18 +100,15 @@
             <p class="podio-name">{{ top3[2].nombre.split(' ')[0] }}</p>
             <p class="podio-amount">{{ formatMonto(top3[2].totalDonado) }}</p>
           </div>
-          <div class="podio-block bronze">
-            <span>3°</span>
-          </div>
+          <div class="podio-block bronze"><span>3°</span></div>
         </div>
 
       </div>
     </section>
 
-    <!-- ══ TABLA COMPLETA ════════════════════════════════════════ -->
+    <!-- ══ TABLA COMPLETA (todos los donantes) ════════════════ -->
     <section class="rk-table-section">
 
-      <!-- Controles de límite -->
       <div class="rk-controls">
         <span class="rk-controls-lbl">Mostrar:</span>
         <div class="limit-btns">
@@ -112,10 +118,7 @@
         </div>
       </div>
 
-      <!-- Tabla -->
       <div class="rk-table">
-
-        <!-- Cabecera -->
         <div class="rk-table-head">
           <span class="col-pos">#</span>
           <span class="col-user">Donante</span>
@@ -124,15 +127,19 @@
           <span class="col-avg">Promedio</span>
         </div>
 
-        <!-- Filas del resto (4+) -->
-        <div class="rk-row" *ngFor="let d of resto"
-             [class.top4]="d.posicion === 4">
+        <!-- TODOS los donantes en la tabla -->
+        <div class="rk-row" *ngFor="let d of ranking"
+             [class.top1]="d.posicion === 1"
+             [class.top2]="d.posicion === 2"
+             [class.top3]="d.posicion === 3">
 
           <div class="col-pos">
-            <span class="pos-num" [class.top4-num]="d.posicion === 4">{{ d.posicion }}</span>
-            <span class="tendencia" *ngIf="d.tendencia === 'up'">▲</span>
-            <span class="tendencia down" *ngIf="d.tendencia === 'down'">▼</span>
-            <span class="tendencia same" *ngIf="d.tendencia === 'same'">—</span>
+            <span class="pos-num"
+                  [class.gold-num]="d.posicion === 1"
+                  [class.silver-num]="d.posicion === 2"
+                  [class.bronze-num]="d.posicion === 3">
+              {{ d.posicion === 1 ? '🥇' : d.posicion === 2 ? '🥈' : d.posicion === 3 ? '🥉' : d.posicion }}
+            </span>
           </div>
 
           <div class="col-user">
@@ -162,7 +169,6 @@
           </div>
 
         </div>
-
       </div>
     </section>
 
